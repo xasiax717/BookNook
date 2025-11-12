@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rejestracja</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .register-container {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .register-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .register-header h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .register-header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        .btn-register {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin-top: 10px;
+        }
+
+        .btn-register:hover {
+            transform: translateY(-2px);
+        }
+
+        .additional-links {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .additional-links a {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .additional-links a:hover {
+            text-decoration: underline;
+        }
+
+        .password-requirements {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        @media (max-width: 600px) {
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+
+            .register-container {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="register-container">
+    <div class="register-header">
+        <h1>Zarejestruj się</h1>
+        <p>Stwórz nowe konto</p>
+    </div>
+
+    <form id="registerForm">
+        <div class="form-row">
+            <div class="form-group">
+                <label for="firstName">Imię *</label>
+                <input type="text" id="firstName" name="firstName" placeholder="Wprowadź imię" required>
+            </div>
+
+            <div class="form-group">
+                <label for="lastName">Nazwisko *</label>
+                <input type="text" id="lastName" name="lastName" placeholder="Wprowadź nazwisko" required>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="email">Adres email *</label>
+            <input type="email" id="email" name="email" placeholder="Wprowadź adres email" required>
+        </div>
+
+        <div class="form-group">
+            <label for="username">Nazwa użytkownika *</label>
+            <input type="text" id="username" name="username" placeholder="Wprowadź nazwę użytkownika" required>
+        </div>
+
+        <div class="form-group">
+            <label for="password">Hasło *</label>
+            <input type="password" id="password" name="password" placeholder="Wprowadź hasło" required>
+            <div class="password-requirements">
+                Hasło musi zawierać co najmniej 8 znaków, w tym wielką literę, cyfrę i znak specjalny
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="confirmPassword">Potwierdź hasło *</label>
+            <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Powtórz hasło" required>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="birthDate">Data urodzenia *</label>
+                <input type="date" id="birthDate" name="birthDate" required>
+            </div>
+
+            <div class="form-group">
+                <label for="gender">Płeć *</label>
+                <select id="gender" name="gender" required>
+                    <option value="">Wybierz płeć</option>
+                    <option value="male">Mężczyzna</option>
+                    <option value="female">Kobieta</option>
+                    <option value="other">Inna</option>
+                    <option value="prefer-not-to-say">Wolę nie podawać</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="phone">Numer telefonu</label>
+            <input type="tel" id="phone" name="phone" placeholder="Wprowadź numer telefonu">
+        </div>
+
+        <button type="submit" class="btn-register">Zarejestruj się</button>
+    </form>
+
+    <div class="additional-links">
+        <p>Masz już konto? <a href="login.html">Zaloguj się</a></p>
+    </div>
+</div>
+
+<script>
+    document.getElementById('registerForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        // Pobieranie wartości z formularza
+        const formData = {
+            firstName: document.getElementById('firstName').value,
+            lastName: document.getElementById('lastName').value,
+            email: document.getElementById('email').value,
+            username: document.getElementById('username').value,
+            password: document.getElementById('password').value,
+            confirmPassword: document.getElementById('confirmPassword').value,
+            birthDate: document.getElementById('birthDate').value,
+            gender: document.getElementById('gender').value,
+            phone: document.getElementById('phone').value
+        };
+
+        // Walidacja hasła
+        if (formData.password !== formData.confirmPassword) {
+            alert('Hasła nie są identyczne!');
+            return;
+        }
+
+        // Walidacja wieku (przykładowo 18+)
+        const birthDate = new Date(formData.birthDate);
+        const today = new Date();
+        const age = today.getFullYear() - birthDate.getFullYear();
+        const monthDiff = today.getMonth() - birthDate.getMonth();
+
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+            age--;
+        }
+
+        if (age < 18) {
+            alert('Musisz mieć ukończone 18 lat, aby się zarejestrować.');
+            return;
+        }
+
+        // Tutaj możesz dodać logikę wysyłania danych do serwera
+        console.log('Dane rejestracji:', formData);
+        alert('Rejestracja udana! Możesz się teraz zalogować.');
+
+        // Przekierowanie do strony logowania
+        // window.location.href = 'login.html';
+    });
+
+    // Walidacja hasła w czasie rzeczywistym
+    document.getElementById('password').addEventListener('input', function() {
+        const password = this.value;
+        const requirements = document.querySelector('.password-requirements');
+
+        // Przykładowe wymagania hasła
+        const hasMinLength = password.length >= 8;
+        const hasUpperCase = /[A-Z]/.test(password);
+        const hasNumber = /[0-9]/.test(password);
+        const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+        if (hasMinLength && hasUpperCase && hasNumber && hasSpecialChar) {
+            requirements.style.color = 'green';
+        } else {
+            requirements.style.color = '#666';
+        }
+    });
+</script>
+</body>
+</html>
