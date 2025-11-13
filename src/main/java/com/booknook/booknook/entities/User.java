@@ -13,17 +13,15 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "users")
-
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Getter
-    @Setter
+
     private String username;
     private String email;
-    private String passwordHash;
+    private String password;
     private String name;
     private String lastName;
     private Long phoneNumber;
@@ -32,7 +30,7 @@ public class User {
 
     public User(String username, String passwordHash) {
         this.username = username;
-        this.passwordHash = passwordHash;
+        this.password = password;
     }
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)

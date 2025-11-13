@@ -19,7 +19,7 @@ public class SecurityConfig {
              })
 
              .authorizeHttpRequests(registry ->{
-                     registry.requestMatchers("/signup").permitAll();
+                     registry.requestMatchers("/register").permitAll();
                      registry.anyRequest().authenticated();
              })
 

@@ -1,4 +1,5 @@
-<!DOCTYPE html>
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
@@ -141,7 +142,7 @@
         <p>Stwórz nowe konto</p>
     </div>
 
-    <form id="registerForm">
+    <form id="registerForm" th:action="@{/register}" th:object="${user}" method="post">
         <div class="form-row">
             <div class="form-group">
                 <label for="firstName">Imię *</label>
@@ -189,7 +190,6 @@
                     <option value="">Wybierz płeć</option>
                     <option value="male">Mężczyzna</option>
                     <option value="female">Kobieta</option>
-                    <option value="other">Inna</option>
                     <option value="prefer-not-to-say">Wolę nie podawać</option>
                 </select>
             </div>
@@ -209,68 +209,7 @@
 </div>
 
 <script>
-    document.getElementById('registerForm').addEventListener('submit', function(e) {
-        e.preventDefault();
 
-        // Pobieranie wartości z formularza
-        const formData = {
-            firstName: document.getElementById('firstName').value,
-            lastName: document.getElementById('lastName').value,
-            email: document.getElementById('email').value,
-            username: document.getElementById('username').value,
-            password: document.getElementById('password').value,
-            confirmPassword: document.getElementById('confirmPassword').value,
-            birthDate: document.getElementById('birthDate').value,
-            gender: document.getElementById('gender').value,
-            phone: document.getElementById('phone').value
-        };
-
-        // Walidacja hasła
-        if (formData.password !== formData.confirmPassword) {
-            alert('Hasła nie są identyczne!');
-            return;
-        }
-
-        // Walidacja wieku (przykładowo 18+)
-        const birthDate = new Date(formData.birthDate);
-        const today = new Date();
-        const age = today.getFullYear() - birthDate.getFullYear();
-        const monthDiff = today.getMonth() - birthDate.getMonth();
-
-        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-            age--;
-        }
-
-        if (age < 18) {
-            alert('Musisz mieć ukończone 18 lat, aby się zarejestrować.');
-            return;
-        }
-
-        // Tutaj możesz dodać logikę wysyłania danych do serwera
-        console.log('Dane rejestracji:', formData);
-        alert('Rejestracja udana! Możesz się teraz zalogować.');
-
-        // Przekierowanie do strony logowania
-        // window.location.href = 'login.html';
-    });
-
-    // Walidacja hasła w czasie rzeczywistym
-    document.getElementById('password').addEventListener('input', function() {
-        const password = this.value;
-        const requirements = document.querySelector('.password-requirements');
-
-        // Przykładowe wymagania hasła
-        const hasMinLength = password.length >= 8;
-        const hasUpperCase = /[A-Z]/.test(password);
-        const hasNumber = /[0-9]/.test(password);
-        const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
-
-        if (hasMinLength && hasUpperCase && hasNumber && hasSpecialChar) {
-            requirements.style.color = 'green';
-        } else {
-            requirements.style.color = '#666';
-        }
-    });
 </script>
 </body>
 </html>
