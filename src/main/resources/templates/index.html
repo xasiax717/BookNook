@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="pl" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BookNook - Twoja biblioteka</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            background-color: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .nav-links a:hover {
+            background-color: rgba(255,255,255,0.2);
+        }
+
+        .btn-login {
+            background-color: transparent;
+            border: 2px solid white;
+        }
+
+        .btn-register {
+            background-color: white;
+            color: #667eea !important;
+            font-weight: bold;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            padding: 4rem 2rem;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: #666;
+            max-width: 600px;
+            margin: 0 auto 2rem;
+        }
+
+        /* Features Section */
+        .features {
+            padding: 4rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .features h2 {
+            text-align: center;
+            margin-bottom: 3rem;
+            color: #333;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .feature-card h3 {
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+
+        /* Footer */
+        .footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 4rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .nav-links {
+                gap: 1rem;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- Navbar -->
+<nav class="navbar">
+    <a href="/" class="logo">BookNook</a>
+    <div class="nav-links">
+        <a href="/">Strona Główna</a>
+        <a href="/books">Książki</a>
+        <a href="/about">O nas</a>
+        <a th:href="@{/auth/login}" class="btn-login">Zaloguj się</a>
+        <a th:href="@{/auth/register}" class="btn-register">Zarejestruj się</a>
+    </div>
+</nav>
+
+<!-- Hero Section -->
+<section class="hero">
+    <h1>Witaj w BookNook!</h1>
+    <p>Twoja osobista biblioteka online. Zarządzaj swoimi książkami, odkrywaj nowe tytuły i dziel się swoją pasją do czytania.</p>
+    <div class="nav-links">
+        <a th:href="@{/auth/register}" class="btn-register">Rozpocznij przygodę</a>
+        <a th:href="@{/books}" class="btn-login" style="color: #667eea; border-color: #667eea;">Przeglądaj książki</a>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="features">
+    <h2>Dlaczego BookNook?</h2>
+    <div class="features-grid">
+        <div class="feature-card">
+            <h3>📚 Twoja Biblioteka</h3>
+            <p>Dodawaj książki do swojej kolekcji, śledź postępy w czytaniu i organizuj swoją bibliotekę.</p>
+        </div>
+        <div class="feature-card">
+            <h3>🔍 Odkrywaj</h3>
+            <p>Znajdź nowe książki dopasowane do Twoich preferencji i zainteresowań.</p>
+        </div>
+        <div class="feature-card">
+            <h3>👥 Społeczność</h3>
+            <p>Dziel się swoimi opiniami i odkryj co czytają inni miłośnicy książek.</p>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+    <p>&copy; 2025 BookNook. Wszystkie prawa zastrzeżone.</p>
+</footer>
+</body>
+</html>
