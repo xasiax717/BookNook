@@ -17,14 +17,22 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+
+    @GetMapping("/register")
+    public String showRegistrationForm(Model model) {
+
+        model.addAttribute("user", new User());
+        return "register";
+    }
+
     @GetMapping("/login")
     public String showLoginForm() {
         return "login";
     }
-    @GetMapping("/register")
-    public String showRegistrationForm() {
-//        System.out.println("get register");
-        return "register";
+
+    @GetMapping("/home")
+    public String showHomePage() {
+        return "home";
     }
 
     @PostMapping("/register")
