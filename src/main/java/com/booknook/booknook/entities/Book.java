@@ -14,17 +14,21 @@ import jdk.jfr.DataAmount;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "books")
-
 public class Book {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String googleBooksId;
+    @Column(name = "external_id", unique = true)
+    private String externalId;
+
     private String title;
     private String authors;
+
+    @Column(columnDefinition = "TEXT")
     private String description;
+
     private String isbn;
     private String publishedYear;
     private String coverUrl;

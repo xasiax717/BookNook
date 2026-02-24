@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wyniki wyszukiwania - BookNook</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding-top: 90px; /* Miejsce na navbar */
+        }
+
+        /* Styl Navbaru (taki sam jak w home.html) */
+        .navbar {
+            background: white;
+            height: 70px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .results-header {
+            color: white;
+            margin-bottom: 30px;
+            text-shadow: 1px 1px 4px rgba(0,0,0,0.2);
+        }
+
+        /* Siatka wyników */
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 25px;
+        }
+
+        /* Karta książki */
+        .book-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease;
+        }
+
+        .book-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .book-cover-wrapper {
+            height: 280px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .book-cover {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: cover;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .book-info {
+            flex-grow: 1;
+            text-align: center;
+        }
+
+        .book-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .book-author {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        /* Fioletowy przycisk */
+        .btn-add {
+            width: 100%;
+            padding: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .btn-add:hover {
+            opacity: 0.9;
+        }
+
+        .no-results {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="nav-left">
+        <a href="/home" style="text-decoration: none; color: #667eea; font-weight: bold;">← Powrót</a>
+    </div>
+    <div class="nav-center">
+        <h1 style="color: #333; font-size: 24px;">BookNook</h1>
+    </div>
+    <div class="nav-right">
+        <span th:text="'Witaj, ' + ${username}">Witaj!</span>
+    </div>
+</nav>
+
+<div class="container">
+    <h2 class="results-header" th:text="'Wyniki dla: ' + ${query}">Wyniki wyszukiwania</h2>
+
+    <div class="results-grid" th:if="${not #lists.isEmpty(books)}">
+        <div th:each="book : ${books}" class="book-card">
+            <div class="book-cover-wrapper">
+                <img class="book-cover"
+                     th:src="${book.coverUrl != null ? book.coverUrl : 'https://via.placeholder.com/180x260?text=Brak+Okładki'}"
+                     alt="Okładka">
+            </div>
+
+            <div class="book-info">
+                <div class="book-title" th:text="${book.title}">Tytuł książki</div>
+                <div class="book-author" th:text="${book.authors}">Autor</div>
+            </div>
+
+            <form th:action="@{/library/add}" method="post">
+                <input type="hidden" name="externalId" th:value="${book.externalId}">
+                <button type="submit" class="btn-add">Dodaj na półkę</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="no-results" th:if="${#lists.isEmpty(books)}">
+        <p>Nie znaleźliśmy żadnych książek pasujących do zapytania. Spróbuj wpisać coś innego!</p>
+        <br>
+        <a href="/home" style="color: #667eea;">Wróć do wyszukiwarki</a>
+    </div>
+</div>
+
+</body>
+</html>
