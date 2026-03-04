@@ -195,7 +195,7 @@
 
 <nav class="navbar">
     <div class="nav-left">
-        <a href="#" class="btn-library">Twoja Biblioteczka</a>
+        <a th:href="@{/library/my-library}" class="btn-library">Twoja Biblioteczka</a>
     </div>
 
     <div class="nav-center">
@@ -222,7 +222,7 @@
     <div class="search-container">
         <div class="home-header">
             <h1>Znajdź nową książkę</h1>
-            <p>Przeszukaj bazę Google Books i dodaj pozycje do swojej kolekcji</p>
+            <p>Przeszukaj bazę książek i dodaj pozycje do swojej kolekcji</p>
         </div>
 
         <form th:action="@{/search}" method="get" class="search-form">

@@ -45,6 +45,7 @@
             text-shadow: 1px 1px 4px rgba(0,0,0,0.2);
         }
 
+
         /* Siatka wyników */
         .results-grid {
             display: grid;
@@ -106,6 +107,59 @@
             color: #666;
             margin-bottom: 15px;
         }
+        .dropdown-add {
+            position: relative;
+            width: 100%;
+        }
+
+        .btn-add-main {
+            width: 100%;
+            padding: 10px;
+         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .add-menu-options {
+            display: none;
+            position: absolute;
+            bottom: 100%; /* Menu wyskakuje do góry, żeby nie zasłaniać opisu */
+            left: 0;
+            width: 100%;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 -5px 15px rgba(0,0,0,0.2);
+            z-index: 10;
+            margin-bottom: 5px;
+        }
+
+        .add-menu-options.show {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .menu-opt {
+            padding: 12px;
+            border: none;
+            background: none;
+            text-align: left;
+            cursor: pointer;
+            font-size: 14px;
+            transition: 0.2s;
+        }
+
+        .menu-opt:hover {
+            background: #f0f2ff;
+            color: #667eea;
+        }
+
+        .menu-opt:not(:last-child) {
+            border-bottom: 1px solid #eee;
+        }
 
         /* Fioletowy przycisk */
         .btn-add {
@@ -162,10 +216,23 @@
                 <div class="book-author" th:text="${book.authors}">Autor</div>
             </div>
 
-            <form th:action="@{/library/add}" method="post">
-                <input type="hidden" name="externalId" th:value="${book.externalId}">
-                <button type="submit" class="btn-add">Dodaj na półkę</button>
-            </form>
+            <div class="add-container">
+                <form th:action="@{/library/add}" method="post" class="add-book-form">
+                    <input type="hidden" name="externalId" th:value="${book.externalId}">
+                    <input type="hidden" name="title" th:value="${book.title}">
+                    <input type="hidden" name="authors" th:value="${book.authors}">
+                    <input type="hidden" name="coverUrl" th:value="${book.coverUrl}">
+
+                    <div class="dropdown-add">
+                        <button type="button" class="btn-add-main" onclick="toggleAddMenu(this)">Dodaj na półkę ▾</button>
+                        <div class="add-menu-options">
+                            <button type="submit" name="status" value="TO_READ" class="menu-opt">⏳ Chcę przeczytać</button>
+                            <button type="submit" name="status" value="READING" class="menu-opt">📖 Teraz czytam</button>
+                            <button type="submit" name="status" value="COMPLETED" class="menu-opt">✅ Przeczytane</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 
@@ -176,5 +243,17 @@
     </div>
 </div>
 
+<script>
+    function toggleAddMenu(btn) {
+    document.querySelectorAll('.add-menu-options').forEach(m => m.classList.remove('show'));
+    btn.nextElementSibling.classList.toggle('show');
+}
+
+    window.onclick = function(event) {
+    if (!event.target.matches('.btn-add-main')) {
+        document.querySelectorAll('.add-menu-options').forEach(m => m.classList.remove('show'));
+    }
+}
+</script>
 </body>
 </html>
