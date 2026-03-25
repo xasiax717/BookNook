@@ -1,6 +1,7 @@
 <!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
-<html lang="pl">
+<html xmlns:th="http://www.thymeleaf.org" lang="pl">
+<head>
+    ...
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -59,6 +60,18 @@
             font-size: 14px;
         }
 
+        .error-message {
+            color: #ff4b2b;
+            font-size: 13px;
+            margin-top: 5px;
+            display: none; /* Ukryte domyślnie */
+            font-weight: bold;
+        }
+
+        /* Klasa do zaznaczania czerwonej ramki inputa */
+        .input-error {
+            border-color: #ff4b2b !important;
+        }
         .form-group input,
         .form-group select {
             width: 100%;
@@ -158,6 +171,7 @@
         <div class="form-group">
             <label for="email">Adres email *</label>
             <input type="email" id="email" name="email" placeholder="Wprowadź adres email" required>
+            <div id="emailError" class="error-message">Wprowadź poprawny adres e-mail!</div>
         </div>
 
         <div class="form-group">
@@ -167,7 +181,7 @@
 
         <div class="form-group">
             <label for="password">Hasło *</label>
-            <input type="password" id="password" name="password" placeholder="Wprowadź hasło" required>
+            <input type="password" id="password" th:field="*{password}" placeholder="Wprowadź hasło" required>
             <div class="password-requirements">
                 Hasło musi zawierać co najmniej 8 znaków, w tym wielką literę, cyfrę i znak specjalny
             </div>
@@ -175,7 +189,11 @@
 
         <div class="form-group">
             <label for="confirmPassword">Potwierdź hasło *</label>
-            <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Powtórz hasło" required>
+            <input type="password"
+                   id="confirmPassword"
+                   name="confirmPassword"  placeholder="Powtórz hasło"
+                   required>
+            <div id="passwordError" class="error-message">Hasła nie są identyczne!</div>
         </div>
 
         <div class="form-row">
@@ -209,7 +227,78 @@
 </div>
 
 <script>
+    const form = document.getElementById('registerForm');
+    const password = document.getElementById('password');
+    const confirmPassword = document.getElementById('confirmPassword');
+    const passwordError = document.getElementById('passwordError');
+    const emailInput = document.getElementById('email');
+    const emailError = document.getElementById('emailError');
+    const birthDateInput = document.getElementById('birthDate');
 
+    // Blokada daty z przyszłości
+    if (birthDateInput) {
+        birthDateInput.max = new Date().toISOString().split("T")[0];
+    }
+
+    // Walidacja formatu Email (Regex)
+    function validateEmail() {
+        const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        const isValid = re.test(String(emailInput.value).toLowerCase());
+
+        if (emailInput.value === "") {
+            emailError.style.display = 'none';
+            emailInput.classList.remove('input-error');
+            return true;
+        }
+
+        if (!isValid) {
+            emailError.style.display = 'block';
+            emailInput.classList.add('input-error');
+        } else {
+            emailError.style.display = 'none';
+            emailInput.classList.remove('input-error');
+        }
+        return isValid;
+    }
+
+    // Walidacja haseł
+    function validatePasswords() {
+        if (confirmPassword.value === "") {
+            passwordError.style.display = 'none';
+            confirmPassword.classList.remove('input-error');
+            return true;
+        }
+
+        if (password.value !== confirmPassword.value) {
+            passwordError.style.display = 'block';
+            confirmPassword.classList.add('input-error');
+            return false;
+        } else {
+            passwordError.style.display = 'none';
+            confirmPassword.classList.remove('input-error');
+            return true;
+        }
+    }
+
+    // Event Listenery
+    password.addEventListener('input', validatePasswords);
+    confirmPassword.addEventListener('input', validatePasswords);
+    emailInput.addEventListener('input', validateEmail);
+
+    form.addEventListener('submit', function(e) {
+        const isPasswordValid = validatePasswords();
+        const isEmailValid = validateEmail();
+
+        if (!isPasswordValid || !isEmailValid) {
+            e.preventDefault();
+
+            let alertMsg = "Proszę poprawić błędy w formularzu:\n";
+            if (!isPasswordValid) alertMsg += "- Hasła muszą być identyczne\n";
+            if (!isEmailValid) alertMsg += "- Format adresu e-mail jest niepoprawny";
+
+            alert(alertMsg);
+        }
+    });
 </script>
 </body>
 </html>

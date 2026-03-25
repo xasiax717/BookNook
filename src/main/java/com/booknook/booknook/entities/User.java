@@ -1,6 +1,9 @@
 package com.booknook.booknook.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Past;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -22,6 +25,9 @@ public class User {
 
 
     private String username;
+    @Email(message = "Niepoprawny format adresu e-mail")
+    @NotBlank(message = "E-mail nie może być pusty")
+    @Column(unique = true) // To już masz pewnie dodane
     private String email;
     private String password;
     @Transient
@@ -30,6 +36,7 @@ public class User {
     private String lastName;
     private Long phoneNumber;
     @DateTimeFormat(pattern = "dd-MM-yyyy")
+    @Past(message = "Nieprawidłowa data urodzenia")
     private LocalDate dateOfBirth;
     private String sex;
 

@@ -18,7 +18,7 @@
             padding-top: 90px; /* Miejsce na navbar */
         }
 
-        /* Styl Navbaru (taki sam jak w home.html) */
+        /* Navbar Styles */
         .navbar {
             background: white;
             height: 70px;
@@ -31,6 +31,79 @@
             top: 0;
             width: 100%;
             z-index: 1000;
+        }
+
+        .nav-left .btn-library:hover {
+            background: #764ba2;
+        }
+
+        .nav-center h1 {
+            color: #333;
+            font-size: 24px;
+            letter-spacing: 1px;
+        }
+
+        .nav-right {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            background: #eee;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 2px solid #667eea;
+        }
+
+        /* Dropdown Menu */
+        .dropdown-menu {
+            position: absolute;
+            top: 55px;
+            right: 0;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            width: 200px;
+            display: none; /* Ukryte domyślnie */
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .dropdown-menu.active {
+            display: flex;
+        }
+
+        .dropdown-item {
+            padding: 12px 20px;
+            text-decoration: none;
+            color: #333;
+            font-size: 14px;
+            transition: 0.2s;
+            border-bottom: 1px solid #f0f0f0;
+            background: none;
+            border-left: none;
+            border-right: none;
+            text-align: left;
+            width: 100%;
+            cursor: pointer;
+        }
+
+        .dropdown-item:hover {
+            background: #f8f9ff;
+            color: #667eea;
+        }
+
+        .logout-btn {
+            color: #ff4b2b;
+            font-weight: bold;
+            border-bottom: none;
         }
 
         .container {
@@ -187,16 +260,27 @@
     </style>
 </head>
 <body>
-
 <nav class="navbar">
     <div class="nav-left">
         <a href="/home" style="text-decoration: none; color: #667eea; font-weight: bold;">← Powrót</a>
     </div>
     <div class="nav-center">
-        <h1 style="color: #333; font-size: 24px;">BookNook</h1>
+        <h1>BookNook</h1>
     </div>
-    <div class="nav-right">
-        <span th:text="'Witaj, ' + ${username}">Witaj!</span>
+
+    <div class="nav-right" id="userMenuTrigger">
+        <span class="user-greeting" th:text="'Witaj, ' + ${username}">Witaj, Użytkowniku</span>
+        <div class="avatar">👤</div>
+
+        <div class="dropdown-menu" id="dropdownMenu">
+            <a href="#" class="dropdown-item">Statystyki</a>
+            <a href="#" class="dropdown-item">Ustawienia profilu</a>
+            <a href="#" class="dropdown-item">Znajomi</a>
+
+            <form th:action="@{/logout}" method="post">
+                <button type="submit" class="dropdown-item logout-btn">Wyloguj się</button>
+            </form>
+        </div>
     </div>
 </nav>
 
@@ -244,15 +328,28 @@
 </div>
 
 <script>
-    function toggleAddMenu(btn) {
-    document.querySelectorAll('.add-menu-options').forEach(m => m.classList.remove('show'));
-    btn.nextElementSibling.classList.toggle('show');
+
+    const trigger = document.getElementById('userMenuTrigger');
+   const menu = document.getElementById('dropdownMenu');
+
+   trigger.addEventListener('click', function(e) {
+       e.stopPropagation();
+       menu.classList.toggle('active');
+   });
+
+   // Zamknij menu po kliknięciu poza nie
+   document.addEventListener('click', function() {
+       menu.classList.remove('active');
+   });
+   function toggleAddMenu(btn) {
+   document.querySelectorAll('.add-menu-options').forEach(m => m.classList.remove('show'));
+   btn.nextElementSibling.classList.toggle('show');
 }
 
-    window.onclick = function(event) {
-    if (!event.target.matches('.btn-add-main')) {
-        document.querySelectorAll('.add-menu-options').forEach(m => m.classList.remove('show'));
-    }
+   window.onclick = function(event) {
+   if (!event.target.matches('.btn-add-main')) {
+       document.querySelectorAll('.add-menu-options').forEach(m => m.classList.remove('show'));
+   }
 }
 </script>
 </body>

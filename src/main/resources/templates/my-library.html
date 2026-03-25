@@ -33,24 +33,36 @@
             z-index: 1000;
         }
 
-        .nav-left .btn-back {
-            color: #667eea;
-            text-decoration: none;
-            font-weight: bold;
-            transition: 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 5px;
+        .nav-left .btn-library:hover {
+            background: #764ba2;
         }
 
-        .nav-left .btn-back:hover { color: #764ba2; }
-        .nav-center h1 { color: #333; font-size: 24px; letter-spacing: 1px; }
+        .nav-center h1 {
+            color: #333;
+            font-size: 24px;
+            letter-spacing: 1px;
+        }
 
-        .nav-right { position: relative; display: flex; align-items: center; gap: 10px; cursor: pointer; }
-        .user-greeting { color: #333; font-size: 14px; font-weight: bold; }
-        .avatar { width: 40px; height: 40px; background: #eee; border-radius: 50%; display: flex; justify-content: center; align-items: center; border: 2px solid #667eea; }
+        .nav-right {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
 
-        /* Dropdown Menu (Navbar) */
+        .avatar {
+            width: 40px;
+            height: 40px;
+            background: #eee;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 2px solid #667eea;
+        }
+
+        /* Dropdown Menu */
         .dropdown-menu {
             position: absolute;
             top: 55px;
@@ -59,14 +71,40 @@
             border-radius: 8px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.2);
             width: 200px;
-            display: none;
+            display: none; /* Ukryte domyślnie */
             flex-direction: column;
             overflow: hidden;
-            z-index: 1100;
         }
-        .dropdown-menu.active { display: flex; }
-        .dropdown-item { padding: 12px 20px; text-decoration: none; color: #333; font-size: 14px; transition: 0.2s; border-bottom: 1px solid #f0f0f0; background: none; border: none; text-align: left; width: 100%; cursor: pointer; }
-        .dropdown-item:hover { background: #f8f9ff; color: #667eea; }
+
+        .dropdown-menu.active {
+            display: flex;
+        }
+
+        .dropdown-item {
+            padding: 12px 20px;
+            text-decoration: none;
+            color: #333;
+            font-size: 14px;
+            transition: 0.2s;
+            border-bottom: 1px solid #f0f0f0;
+            background: none;
+            border-left: none;
+            border-right: none;
+            text-align: left;
+            width: 100%;
+            cursor: pointer;
+        }
+
+        .dropdown-item:hover {
+            background: #f8f9ff;
+            color: #667eea;
+        }
+
+        .logout-btn {
+            color: #ff4b2b;
+            font-weight: bold;
+            border-bottom: none;
+        }
 
         /* Shelf Styles */
         .shelf-container { margin-bottom: 50px; }
@@ -210,7 +248,7 @@
 
 <nav class="navbar">
     <div class="nav-left">
-        <a href="/home" class="btn-back">← Powrót do szukania</a>
+        <a href="/home" class="btn-back">← Powrót </a>
     </div>
     <div class="nav-center"><h1>BookNook</h1></div>
     <div class="nav-right" id="userMenuTrigger">
@@ -218,8 +256,11 @@
         <div class="avatar">👤</div>
         <div class="dropdown-menu" id="dropdownMenu">
             <a href="#" class="dropdown-item">Statystyki</a>
-            <form th:action="@{/logout}" method="post" style="width: 100%;">
-                <button type="submit" class="dropdown-item" style="color: #ff4b2b; font-weight: bold;">Wyloguj się</button>
+            <a href="#" class="dropdown-item">Ustawienia profilu</a>
+            <a href="#" class="dropdown-item">Znajomi</a>
+
+            <form th:action="@{/logout}" method="post">
+                <button type="submit" class="dropdown-item logout-btn">Wyloguj się</button>
             </form>
         </div>
     </div>

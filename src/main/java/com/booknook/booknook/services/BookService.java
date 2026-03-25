@@ -21,6 +21,7 @@ public class BookService {
         String url = UriComponentsBuilder
                 .fromHttpUrl("https://openlibrary.org/search.json")
                 .queryParam("q", query)
+                .queryParam("lang", "pol,eng")
                 .queryParam("limit", 150) // Pobieramy dużo, żeby Java miała co filtrować
                 .toUriString();
 
