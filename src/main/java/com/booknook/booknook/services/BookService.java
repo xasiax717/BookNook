@@ -2,6 +2,7 @@ package com.booknook.booknook.services;
 
 import com.booknook.booknook.dto.OpenLibraryResponse;
 import com.booknook.booknook.entities.Book;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -87,5 +88,12 @@ public class BookService {
         }
 
         return book;
+    }
+
+    @Autowired
+    private com.booknook.booknook.repositories.BookRepository bookRepository;
+
+    public Book findByExternalId(String externalId) {
+        return bookRepository.findByExternalId(externalId).orElse(null);
     }
 }

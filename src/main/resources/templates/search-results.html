@@ -161,7 +161,10 @@
     <h2 class="results-header" th:text="'Wyniki dla: ' + ${query}">Wyniki wyszukiwania</h2>
 
     <div class="results-grid" th:if="${not #lists.isEmpty(books)}">
-        <div th:each="book : ${books}" class="book-card">
+        <div th:each="book : ${books}" class="book-card"
+             th:onclick="|window.location.href='@{/library/book-details(id=${book.externalId}, coverUrl=${book.coverUrl}, title=${book.title}, authors=${book.authors})}'|"
+             style="cursor: pointer;">
+
             <div class="book-cover-wrapper">
                 <img class="book-cover"
                      th:src="${book.coverUrl != null ? book.coverUrl : 'https://via.placeholder.com/180x260?text=Brak+Okładki'}"
@@ -173,7 +176,7 @@
                 <div class="book-author" th:text="${book.authors}">Autor</div>
             </div>
 
-            <div class="add-container">
+            <div class="add-container" onclick="event.stopPropagation();">
                 <form th:action="@{/library/add}" method="post" class="add-book-form">
                     <input type="hidden" name="externalId" th:value="${book.externalId}">
                     <input type="hidden" name="title" th:value="${book.title}">
@@ -203,27 +206,40 @@
 <script>
 
     const trigger = document.getElementById('userMenuTrigger');
-   const menu = document.getElementById('dropdownMenu');
+    const menu = document.getElementById('dropdownMenu');
 
-   trigger.addEventListener('click', function(e) {
-       e.stopPropagation();
-       menu.classList.toggle('active');
-   });
+    trigger.addEventListener('click', function(e) {
+        e.stopPropagation();
+        menu.classList.toggle('active');
+    });
 
-   // Zamknij menu po kliknięciu poza nie
-   document.addEventListener('click', function() {
-       menu.classList.remove('active');
-   });
-   function toggleAddMenu(btn) {
-   document.querySelectorAll('.add-menu-options').forEach(m => m.classList.remove('show'));
-   btn.nextElementSibling.classList.toggle('show');
-}
+    function toggleAddMenu(btn) {
+        event.stopPropagation();
 
-   window.onclick = function(event) {
-   if (!event.target.matches('.btn-add-main')) {
-       document.querySelectorAll('.add-menu-options').forEach(m => m.classList.remove('show'));
-   }
-}
+        const currentMenu = btn.nextElementSibling;
+        const isOpen = currentMenu.classList.contains('show');
+
+        document.querySelectorAll('.add-menu-options').forEach(m => {
+            m.classList.remove('show');
+        });
+
+        if (!isOpen) {
+            currentMenu.classList.add('show');
+        }
+    }
+
+    window.onclick = function(event) {
+        // Zamknij menu profilu, jeśli kliknięto poza nie
+        if (!event.target.closest('#userMenuTrigger')) {
+            menu.classList.remove('active');
+        }
+
+        if (!event.target.matches('.btn-add-main')) {
+            document.querySelectorAll('.add-menu-options').forEach(m => {
+                m.classList.remove('show');
+            });
+        }
+    };
 </script>
 </body>
 </html>

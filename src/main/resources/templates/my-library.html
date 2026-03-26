@@ -8,7 +8,6 @@
     <link rel="stylesheet" th:href="@{/css/common.css}">
 
     <style>
-        /* --- STYLE SPECYFICZNE DLA BIBLIOTECZKI --- */
 
         .container { max-width: 1200px; margin: 0 auto; padding: 20px; margin-top: 80px; }
 
@@ -189,13 +188,18 @@
                             <hr>
                             <form th:action="@{/library/remove}" method="post">
                                 <input type="hidden" name="userBookId" th:value="${userBook.id}">
-                                <button type="submit" class="menu-opt opt-remove" onclick="return confirm('Usunąć tę książkę z biblioteki?')">🗑️ Usuń książkę</button>
+                                <button type="submit" class="menu-opt opt-remove" onclick="return confirm('Usunąć tę książkę?')">🗑️ Usuń</button>
                             </form>
                         </div>
                     </div>
 
-                    <img th:src="${userBook.book.coverUrl != null ? userBook.book.coverUrl : 'https://via.placeholder.com/180x250?text=Brak+Okładki'}" alt="Okładka">
-                    <div class="book-title" th:title="${userBook.book.title}" th:text="${userBook.book.title}">Tytuł</div>
+                    <a th:href="@{/library/book-details(id=${userBook.book.externalId})}" style="text-decoration: none;">
+                        <img th:src="${userBook.book.coverUrl != null ? userBook.book.coverUrl : 'https://via.placeholder.com/180x250?text=Brak+Okładki'}" alt="Okładka">
+                    </a>
+
+                    <a th:href="@{/library/book-details(id=${userBook.book.externalId})}" style="text-decoration: none;">
+                        <div class="book-title" th:title="${userBook.book.title}" th:text="${userBook.book.title}" style="color: #333;">Tytuł</div>
+                    </a>
                     <div class="book-author" th:text="${userBook.book.authors}">Autor</div>
                 </div>
             </div>
@@ -220,12 +224,18 @@
                             <hr>
                             <form th:action="@{/library/remove}" method="post">
                                 <input type="hidden" name="userBookId" th:value="${userBook.id}">
-                                <button type="submit" class="menu-opt opt-remove" onclick="return confirm('Usunąć tę książkę z biblioteki?')">🗑️ Usuń książkę</button>
+                                <button type="submit" class="menu-opt opt-remove">🗑️ Usuń</button>
                             </form>
                         </div>
                     </div>
-                    <img th:src="${userBook.book.coverUrl != null ? userBook.book.coverUrl : 'https://via.placeholder.com/180x250?text=Brak+Okładki'}" alt="Okładka">
-                    <div class="book-title" th:title="${userBook.book.title}" th:text="${userBook.book.title}">Tytuł</div>
+
+                    <a th:href="@{/library/book-details(id=${userBook.book.externalId})}" style="text-decoration: none;">
+                        <img th:src="${userBook.book.coverUrl != null ? userBook.book.coverUrl : 'https://via.placeholder.com/180x250?text=Brak+Okładki'}" alt="Okładka">
+                    </a>
+
+                    <a th:href="@{/library/book-details(id=${userBook.book.externalId})}" style="text-decoration: none;">
+                        <div class="book-title" th:title="${userBook.book.title}" th:text="${userBook.book.title}" style="color: #333;">Tytuł</div>
+                    </a>
                     <div class="book-author" th:text="${userBook.book.authors}">Autor</div>
                 </div>
             </div>
@@ -250,12 +260,18 @@
                             <hr>
                             <form th:action="@{/library/remove}" method="post">
                                 <input type="hidden" name="userBookId" th:value="${userBook.id}">
-                                <button type="submit" class="menu-opt opt-remove" onclick="return confirm('Usunąć tę książkę z biblioteki?')">🗑️ Usuń książkę</button>
+                                <button type="submit" class="menu-opt opt-remove">🗑️ Usuń</button>
                             </form>
                         </div>
                     </div>
-                    <img th:src="${userBook.book.coverUrl != null ? userBook.book.coverUrl : 'https://via.placeholder.com/180x250?text=Brak+Okładki'}" alt="Okładka">
-                    <div class="book-title" th:title="${userBook.book.title}" th:text="${userBook.book.title}">Tytuł</div>
+
+                    <a th:href="@{/library/book-details(id=${userBook.book.externalId})}" style="text-decoration: none;">
+                        <img th:src="${userBook.book.coverUrl != null ? userBook.book.coverUrl : 'https://via.placeholder.com/180x250?text=Brak+Okładki'}" alt="Okładka">
+                    </a>
+
+                    <a th:href="@{/library/book-details(id=${userBook.book.externalId})}" style="text-decoration: none;">
+                        <div class="book-title" th:title="${userBook.book.title}" th:text="${userBook.book.title}" style="color: #333;">Tytuł</div>
+                    </a>
                     <div class="book-author" th:text="${userBook.book.authors}">Autor</div>
                 </div>
             </div>

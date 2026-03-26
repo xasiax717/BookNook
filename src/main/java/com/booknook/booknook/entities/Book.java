@@ -33,6 +33,7 @@ public class Book {
     private String publishedYear;
     private String coverUrl;
     private String categories;
+    private Integer numberOfPages;
 
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL)
     private List<UserBook> userBooks = new ArrayList<>();

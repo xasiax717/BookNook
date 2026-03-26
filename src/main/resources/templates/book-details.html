@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Szczegóły książki - BookNook</title>
+    <link rel="stylesheet" th:href="@{/css/common.css}">
+    <style>
+        .details-container {
+            max-width: 1000px;
+            margin: 100px auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            display: flex;
+            gap: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .details-left img {
+            width: 300px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .details-right { flex: 1; }
+        .details-right h1 { color: #333; margin-bottom: 10px; }
+        .details-right h3 { color: #667eea; margin-bottom: 20px; }
+        .description-box {
+            line-height: 1.6;
+            color: #444;
+            background: #f9faff;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+        .btn-add-details {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 25px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .dropdown-add { position: relative; }
+
+        .btn-add-main {
+            width: 100%;
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 16px;
+        }
+
+        .add-menu-options {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            z-index: 100;
+            margin-top: 5px;
+        }
+
+        .add-menu-options.show { display: flex; flex-direction: column; }
+
+        .menu-opt {
+            padding: 12px 15px;
+            border: none;
+            background: none;
+            text-align: left;
+            cursor: pointer;
+            font-size: 14px;
+            transition: 0.2s;
+            color: #444;
+        }
+
+        .menu-opt:hover { background: #f0f2ff; color: #667eea; }
+        .menu-opt:not(:last-child) { border-bottom: 1px solid #eee; }
+
+
+        .btn-status-active {
+            width: 280px;
+            padding: 12px 20px;
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 16px;
+            text-align: left;
+        }
+
+        .btn-status-active:hover {
+            background: #f0f2ff;
+        }
+
+        .menu-label {
+            font-size: 11px;
+            color: #999;
+            padding: 10px 15px 5px;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar">
+    <div class="nav-left">
+        <a href="javascript:void(0);" onclick="history.back();" style="text-decoration: none; color: #667eea; font-weight: bold;">← Powrót</a>
+    </div>
+    <div class="nav-center">
+        <h1>BookNook</h1>
+    </div>
+
+    <div class="nav-right" id="userMenuTrigger">
+        <span class="user-greeting" th:text="'Witaj, ' + ${username}">Witaj, Użytkowniku</span>
+        <div class="avatar">👤</div>
+
+        <div class="dropdown-menu" id="dropdownMenu">
+            <a href="#" class="dropdown-item">Statystyki</a>
+            <a href="#" class="dropdown-item">Ustawienia profilu</a>
+            <a href="#" class="dropdown-item">Znajomi</a>
+
+            <form th:action="@{/logout}" method="post">
+                <button type="submit" class="dropdown-item logout-btn">Wyloguj się</button>
+            </form>
+        </div>
+    </div>
+</nav>
+
+<div class="details-container">
+    <div class="details-left">
+        <img th:src="${book.coverUrl != null ? book.coverUrl : 'https://via.placeholder.com/300x450?text=Brak+Okładki'}" alt="Okładka">
+    </div>
+    <div class="details-right">
+        <h1 th:text="${book.title}">Tytuł książki</h1>
+        <h3 th:text="${book.authors}">Autor</h3>
+
+        <p style="font-weight: bold; color: #888; margin-bottom: 5px;">Opis książki:</p>
+        <div class="description-box">
+            <p th:text="${book.description}">Tutaj pojawi się opis pobrany z Open Library...</p>
+        </div>
+
+        <div class="status-area" style="margin-top: 30px;">
+            <form th:action="${isSaved} ? @{/library/update-status} : @{/library/add}" method="post">
+                <input type="hidden" name="externalId" th:value="${book.externalId}">
+                <input type="hidden" name="title" th:value="${book.title}">
+                <input type="hidden" name="authors" th:value="${book.authors}">
+                <input type="hidden" name="coverUrl" th:value="${book.coverUrl}">
+                <input type="hidden" name="fromDetails" value="true">
+                <input type="hidden" name="userBookId" th:if="${isSaved}" th:value="${userBookId}">
+
+                <div class="dropdown-add">
+                    <button type="button"
+                            th:class="${isSaved} ? 'btn-status-active' : 'btn-add-main'"
+                            onclick="toggleAddMenu(this)">
+
+                        <span th:if="${!isSaved}">Dodaj na półkę ▾</span>
+
+                        <span th:if="${isSaved}" th:switch="${currentStatus}">
+                    <span th:case="'READING'">📖 Teraz czytam ▾</span>
+                    <span th:case="'TO_READ'">⏳ Chcę przeczytać ▾</span>
+                    <span th:case="'COMPLETED'">✅ Przeczytane ▾</span>
+                    <span th:case="*">Zmień status ▾</span>
+                </span>
+                    </button>
+
+                    <div class="add-menu-options">
+                        <p class="menu-label" th:text="${isSaved} ? 'Zmień status na:' : 'Wybierz półkę:'"></p>
+
+                        <button type="submit" name="newStatus" value="TO_READ" class="menu-opt" th:if="${currentStatus != 'TO_READ'}">⏳ Chcę przeczytać</button>
+                        <button type="submit" name="newStatus" value="READING" class="menu-opt" th:if="${currentStatus != 'READING'}">📖 Teraz czytam</button>
+                        <button type="submit" name="newStatus" value="COMPLETED" class="menu-opt" th:if="${currentStatus != 'COMPLETED'}">✅ Przeczytane</button>
+
+                        <div th:if="${isSaved}">
+                            <hr style="border: 0; border-top: 1px solid #eee; margin: 5px 0;">
+                            <button type="submit" th:formaction="@{/library/remove}" class="menu-opt" style="color: #ff4b2b;" onclick="return confirm('Usunąć książkę z biblioteki?')">
+                                🗑️ Usuń z biblioteki
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div th:if="${isSaved}">
+            <p style="margin-top: 20px; color: #2ecc71; font-weight: bold;">✓ Masz tę książkę w swojej bibliotece</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    // MENU NAVBAR
+    const trigger = document.getElementById('userMenuTrigger');
+    const menu = document.getElementById('dropdownMenu');
+
+    trigger.addEventListener('click', function(e) {
+        e.stopPropagation();
+        menu.classList.toggle('active');
+    });
+
+    // MENU DODAWANIA DO PÓŁEK
+    function toggleAddMenu(btn) {
+        // Zatrzymujemy propagację, aby kliknięcie w przycisk nie odpaliło window.onclick
+        if (event) event.stopPropagation();
+
+        const addMenu = btn.nextElementSibling;
+        // Przełączamy widoczność (toggle)
+        addMenu.classList.toggle('show');
+    }
+
+
+    window.onclick = function(event) {
+        // Zamykanie menu profilu (Navbar)
+        if (!event.target.closest('#userMenuTrigger')) {
+            if (menu && menu.classList.contains('active')) {
+                menu.classList.remove('active');
+            }
+        }
+
+        if (!event.target.matches('.btn-add-main')) {
+            const addMenus = document.querySelectorAll('.add-menu-options');
+            addMenus.forEach(m => {
+                if (m.classList.contains('show')) {
+                    m.classList.remove('show');
+                }
+            });
+        }
+    };
+</script>
+
+</body>
+</html>

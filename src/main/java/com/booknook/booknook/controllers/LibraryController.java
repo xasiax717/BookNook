@@ -6,6 +6,7 @@ import com.booknook.booknook.entities.UserBook;
 import com.booknook.booknook.repositories.BookRepository;
 import com.booknook.booknook.repositories.UserBookRepository;
 import com.booknook.booknook.repositories.UserRepository;
+import com.booknook.booknook.services.OpenLibraryService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
@@ -25,13 +27,16 @@ public class LibraryController {
     private final UserRepository userRepository;
     private final BookRepository bookRepository;
     private final UserBookRepository userBookRepository;
+    private final OpenLibraryService openLibraryService;
 
     public LibraryController(UserRepository userRepository,
                              BookRepository bookRepository,
-                             UserBookRepository userBookRepository) {
+                             UserBookRepository userBookRepository,
+                             OpenLibraryService openLibraryService) {
         this.userRepository = userRepository;
         this.bookRepository = bookRepository;
         this.userBookRepository = userBookRepository;
+        this.openLibraryService = openLibraryService;
     }
 
     @PostMapping("/add")
@@ -40,7 +45,8 @@ public class LibraryController {
             @RequestParam String title,
             @RequestParam String authors,
             @RequestParam(required = false) String coverUrl,
-            @RequestParam String status,
+            @RequestParam String newStatus,
+            @RequestParam(defaultValue = "false") boolean fromDetails, // Ustawiamy domyślną wartość
             Principal principal,
             RedirectAttributes redirectAttributes) {
 
@@ -49,11 +55,10 @@ public class LibraryController {
         }
 
         try {
-            // 1. Pobierz użytkownika
             User user = userRepository.findByUsername(principal.getName())
                     .orElseThrow(() -> new RuntimeException("Użytkownik nie znaleziony"));
 
-            // 2. Znajdź lub stwórz książkę
+            // Pobieramy książkę lub ją tworzymy
             Book book = bookRepository.findByExternalId(externalId).orElseGet(() -> {
                 Book newBook = new Book();
                 newBook.setExternalId(externalId);
@@ -63,26 +68,33 @@ public class LibraryController {
                 return bookRepository.save(newBook);
             });
 
-            // 3. Sprawdź duplikaty na półce użytkownika
             if (userBookRepository.existsByUserAndBook(user, book)) {
                 redirectAttributes.addFlashAttribute("error", "Masz już tę książkę w biblioteczce!");
             } else {
-                // 4. Bezpieczne tworzenie UserBook (bez polegania na konstruktorze)
                 UserBook userBook = new UserBook();
                 userBook.setUser(user);
                 userBook.setBook(book);
                 userBook.setAddedAt(LocalDateTime.now());
-                userBook.setStatus(status);; // Domyślny status
+                userBook.setStatus(newStatus); // Naprawiony średnik
 
                 userBookRepository.save(userBook);
                 redirectAttributes.addFlashAttribute("message", "Dodano książkę: " + title);
             }
 
         } catch (Exception e) {
-            // Jeśli coś pójdzie nie tak, zobaczysz to w konsoli IntelliJ
             System.err.println("BŁĄD PODCZAS DODAWANIA: " + e.getMessage());
-            e.printStackTrace();
             redirectAttributes.addFlashAttribute("error", "Wystąpił błąd podczas dodawania książki.");
+        }
+
+        // --- BEZPIECZNE PRZEKIEROWANIE ---
+        if (fromDetails) {
+            return UriComponentsBuilder.fromPath("redirect:/library/book-details")
+                    .queryParam("id", externalId)
+                    .queryParam("coverUrl", coverUrl)
+                    .queryParam("title", title)
+                    .queryParam("authors", authors)
+                    .build()
+                    .toUriString();
         }
 
         return "redirect:/home";
@@ -104,14 +116,25 @@ public class LibraryController {
     }
 
     @PostMapping("/update-status")
-    public String updateBookStatus(@RequestParam Long userBookId, @RequestParam String newStatus, RedirectAttributes redirectAttributes) {
+    public String updateBookStatus(
+            @RequestParam Long userBookId,
+            @RequestParam String newStatus,
+            @RequestParam(defaultValue = "false") boolean fromDetails, // NOWE
+            RedirectAttributes redirectAttributes) {
+
         UserBook userBook = userBookRepository.findById(userBookId)
                 .orElseThrow(() -> new RuntimeException("Nie znaleziono pozycji na półce"));
 
         userBook.setStatus(newStatus);
         userBookRepository.save(userBook);
 
-        redirectAttributes.addFlashAttribute("message", "Przeniesiono książkę!");
+        redirectAttributes.addFlashAttribute("message", "Zmieniono status książki!");
+
+        if (fromDetails) {
+            String externalId = userBook.getBook().getExternalId();
+            return "redirect:/library/book-details?id=" + externalId;
+        }
+
         return "redirect:/library/my-library";
     }
 
@@ -121,5 +144,48 @@ public class LibraryController {
 
         redirectAttributes.addFlashAttribute("message", "Usunięto książkę z Twojej biblioteczki.");
         return "redirect:/library/my-library";
+    }
+    @GetMapping("/book-details")
+    public String showBookDetails(@RequestParam String id,
+                                  @RequestParam(required = false) String coverUrl,
+                                  @RequestParam(required = false) String title,
+                                  @RequestParam(required = false) String authors,
+                                  Model model, Principal principal) {
+
+        // 1. Podstawowe dane książki (tak jak robiliśmy)
+        Book book = bookRepository.findByExternalId(id).orElse(null);
+        if (book == null) {
+            book = new Book();
+            book.setExternalId(id);
+            book.setCoverUrl(coverUrl);
+            book.setTitle(title);
+            book.setAuthors(authors);
+        }
+
+        // 2. SPRAWDZANIE STATUSU UŻYTKOWNIKA (To jest klucz do Twojego pytania)
+        if (principal != null) {
+            model.addAttribute("username", principal.getName());
+            User user = userRepository.findByUsername(principal.getName()).orElse(null);
+
+            if (user != null && book.getId() != null) {
+                // Szukamy, czy ta konkretna książka jest na półce tego użytkownika
+                var userBookOpt = userBookRepository.findByUserAndBook(user, book);
+                if (userBookOpt.isPresent()) {
+                    model.addAttribute("isSaved", true);
+                    model.addAttribute("currentStatus", userBookOpt.get().getStatus());
+                    model.addAttribute("userBookId", userBookOpt.get().getId());
+                } else {
+                    model.addAttribute("isSaved", false);
+                }
+            } else {
+                model.addAttribute("isSaved", false);
+            }
+        }
+
+        String description = openLibraryService.fetchDescription(id);
+        book.setDescription(description);
+        model.addAttribute("book", book);
+
+        return "book-details";
     }
 }
