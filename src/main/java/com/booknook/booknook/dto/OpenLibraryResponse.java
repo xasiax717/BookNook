@@ -27,6 +27,9 @@ public class OpenLibraryResponse {
         @JsonProperty("isbn")
         private List<String> isbn;
 
+        @JsonProperty("number_of_pages_median")
+        private Integer numberOfPagesMedian;
+
         @JsonProperty("cover_i")
         private Integer coverI; // numer do wygenerowania okładki
     }

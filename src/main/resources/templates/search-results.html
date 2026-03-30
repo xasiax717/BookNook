@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wyniki wyszukiwania - BookNook</title>
+    <title>Search Results - BookNook</title>
 
     <link rel="stylesheet" th:href="@{/css/common.css}">
 
     <style>
         .container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 20px;
-        margin-top: 80px;
-    }
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            margin-top: 80px;
+        }
 
         .results-header {
             color: white;
@@ -21,14 +21,14 @@
             text-shadow: 1px 1px 4px rgba(0,0,0,0.2);
         }
 
-        /* Siatka wyników */
+        /* Results Grid */
         .results-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
             gap: 25px;
         }
 
-        /* Karta książki */
+        /* Book Card */
         .book-card {
             background: white;
             border-radius: 12px;
@@ -81,7 +81,7 @@
             margin-bottom: 15px;
         }
 
-        /* Menu dodawania do biblioteki (Kebab/Dropdown na karcie) */
+        /* Dropdown Menu on Card */
         .dropdown-add { position: relative; width: 100%; }
 
         .btn-add-main {
@@ -119,6 +119,7 @@
             cursor: pointer;
             font-size: 14px;
             transition: 0.2s;
+            color: #444;
         }
 
         .menu-opt:hover { background: #f0f2ff; color: #667eea; }
@@ -135,30 +136,30 @@
 <body>
 <nav class="navbar">
     <div class="nav-left">
-        <a href="/home" style="text-decoration: none; color: #667eea; font-weight: bold;">← Powrót</a>
+        <a href="/home" style="text-decoration: none; color: #667eea; font-weight: bold;">← Back</a>
     </div>
     <div class="nav-center">
         <h1>BookNook</h1>
     </div>
 
     <div class="nav-right" id="userMenuTrigger">
-        <span class="user-greeting" th:text="'Witaj, ' + ${username}">Witaj, Użytkowniku</span>
+        <span class="user-greeting" th:text="'Hello, ' + ${username}">Hello, User</span>
         <div class="avatar">👤</div>
 
         <div class="dropdown-menu" id="dropdownMenu">
-            <a href="#" class="dropdown-item">Statystyki</a>
-            <a href="#" class="dropdown-item">Ustawienia profilu</a>
-            <a href="#" class="dropdown-item">Znajomi</a>
+            <a href="#" class="dropdown-item">Statistics</a>
+            <a href="#" class="dropdown-item">Profile Settings</a>
+            <a href="#" class="dropdown-item">Friends</a>
 
             <form th:action="@{/logout}" method="post">
-                <button type="submit" class="dropdown-item logout-btn">Wyloguj się</button>
+                <button type="submit" class="dropdown-item logout-btn">Log out</button>
             </form>
         </div>
     </div>
 </nav>
 
 <div class="container">
-    <h2 class="results-header" th:text="'Wyniki dla: ' + ${query}">Wyniki wyszukiwania</h2>
+    <h2 class="results-header" th:text="'Results for: ' + ${query}">Search Results</h2>
 
     <div class="results-grid" th:if="${not #lists.isEmpty(books)}">
         <div th:each="book : ${books}" class="book-card"
@@ -167,13 +168,13 @@
 
             <div class="book-cover-wrapper">
                 <img class="book-cover"
-                     th:src="${book.coverUrl != null ? book.coverUrl : 'https://via.placeholder.com/180x260?text=Brak+Okładki'}"
-                     alt="Okładka">
+                     th:src="${book.coverUrl != null ? book.coverUrl : 'https://via.placeholder.com/180x260?text=No+Cover'}"
+                     alt="Cover">
             </div>
 
             <div class="book-info">
-                <div class="book-title" th:text="${book.title}">Tytuł książki</div>
-                <div class="book-author" th:text="${book.authors}">Autor</div>
+                <div class="book-title" th:text="${book.title}">Book Title</div>
+                <div class="book-author" th:text="${book.authors}">Author</div>
             </div>
 
             <div class="add-container" onclick="event.stopPropagation();">
@@ -184,11 +185,11 @@
                     <input type="hidden" name="coverUrl" th:value="${book.coverUrl}">
 
                     <div class="dropdown-add">
-                        <button type="button" class="btn-add-main" onclick="toggleAddMenu(this)">Dodaj na półkę ▾</button>
+                        <button type="button" class="btn-add-main" onclick="toggleAddMenu(this)">Add to shelf ▾</button>
                         <div class="add-menu-options">
-                            <button type="submit" name="status" value="TO_READ" class="menu-opt">⏳ Chcę przeczytać</button>
-                            <button type="submit" name="status" value="READING" class="menu-opt">📖 Teraz czytam</button>
-                            <button type="submit" name="status" value="COMPLETED" class="menu-opt">✅ Przeczytane</button>
+                            <button type="submit" name="status" value="TO_READ" class="menu-opt">⏳ Want to read</button>
+                            <button type="submit" name="status" value="READING" class="menu-opt">📖 Currently reading</button>
+                            <button type="submit" name="status" value="COMPLETED" class="menu-opt">✅ Read</button>
                         </div>
                     </div>
                 </form>
@@ -197,14 +198,14 @@
     </div>
 
     <div class="no-results" th:if="${#lists.isEmpty(books)}">
-        <p>Nie znaleźliśmy żadnych książek pasujących do zapytania. Spróbuj wpisać coś innego!</p>
+        <h3>No books found</h3>
+        <p>We couldn't find any books matching your search. Try something else!</p>
         <br>
-        <a href="/home" style="color: #667eea;">Wróć do wyszukiwarki</a>
+        <a href="/home" style="color: #667eea; font-weight: bold;">Back to search</a>
     </div>
 </div>
 
 <script>
-
     const trigger = document.getElementById('userMenuTrigger');
     const menu = document.getElementById('dropdownMenu');
 
@@ -229,9 +230,10 @@
     }
 
     window.onclick = function(event) {
-        // Zamknij menu profilu, jeśli kliknięto poza nie
         if (!event.target.closest('#userMenuTrigger')) {
-            menu.classList.remove('active');
+            if (menu.classList.contains('active')) {
+                menu.classList.remove('active');
+            }
         }
 
         if (!event.target.matches('.btn-add-main')) {

@@ -30,7 +30,7 @@ public class Book {
     private String description;
 
     private String isbn;
-    private String publishedYear;
+    private Integer firstPublishYear;
     private String coverUrl;
     private String categories;
     private Integer numberOfPages;

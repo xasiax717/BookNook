@@ -2,7 +2,8 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Szczegóły książki - BookNook</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Details - BookNook</title>
     <link rel="stylesheet" th:href="@{/css/common.css}">
     <style>
         .details-container {
@@ -30,16 +31,6 @@
             padding: 20px;
             border-radius: 10px;
             border-left: 4px solid #667eea;
-        }
-        .btn-add-details {
-            display: inline-block;
-            margin-top: 20px;
-            padding: 12px 25px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            font-weight: bold;
         }
 
         .dropdown-add { position: relative; }
@@ -86,7 +77,6 @@
         .menu-opt:hover { background: #f0f2ff; color: #667eea; }
         .menu-opt:not(:last-child) { border-bottom: 1px solid #eee; }
 
-
         .btn-status-active {
             width: 280px;
             padding: 12px 20px;
@@ -112,28 +102,48 @@
             text-transform: uppercase;
             font-weight: bold;
         }
+
+        .book-metadata {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #f0f2ff;
+            color: #667eea;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            border: 1px solid #e0e6ff;
+        }
     </style>
 </head>
 <body>
 <nav class="navbar">
     <div class="nav-left">
-        <a href="javascript:void(0);" onclick="history.back();" style="text-decoration: none; color: #667eea; font-weight: bold;">← Powrót</a>
+        <a href="javascript:void(0);" onclick="history.back();" style="text-decoration: none; color: #667eea; font-weight: bold;">← Back</a>
     </div>
     <div class="nav-center">
         <h1>BookNook</h1>
     </div>
 
     <div class="nav-right" id="userMenuTrigger">
-        <span class="user-greeting" th:text="'Witaj, ' + ${username}">Witaj, Użytkowniku</span>
+        <span class="user-greeting" th:text="'Hello, ' + ${username}">Hello, User</span>
         <div class="avatar">👤</div>
 
         <div class="dropdown-menu" id="dropdownMenu">
-            <a href="#" class="dropdown-item">Statystyki</a>
-            <a href="#" class="dropdown-item">Ustawienia profilu</a>
-            <a href="#" class="dropdown-item">Znajomi</a>
+            <a href="#" class="dropdown-item">Statistics</a>
+            <a href="#" class="dropdown-item">Profile Settings</a>
+            <a href="#" class="dropdown-item">Friends</a>
 
             <form th:action="@{/logout}" method="post">
-                <button type="submit" class="dropdown-item logout-btn">Wyloguj się</button>
+                <button type="submit" class="dropdown-item logout-btn">Log out</button>
             </form>
         </div>
     </div>
@@ -141,15 +151,27 @@
 
 <div class="details-container">
     <div class="details-left">
-        <img th:src="${book.coverUrl != null ? book.coverUrl : 'https://via.placeholder.com/300x450?text=Brak+Okładki'}" alt="Okładka">
+        <img th:src="${book.coverUrl != null ? book.coverUrl : 'https://via.placeholder.com/300x450?text=No+Cover'}" alt="Cover">
     </div>
     <div class="details-right">
-        <h1 th:text="${book.title}">Tytuł książki</h1>
-        <h3 th:text="${book.authors}">Autor</h3>
+        <h1 th:text="${book.title}">Book Title</h1>
+        <h3 th:text="${book.authors}">Author</h3>
 
-        <p style="font-weight: bold; color: #888; margin-bottom: 5px;">Opis książki:</p>
+        <div class="book-metadata">
+            <div class="meta-item" th:if="${book.firstPublishYear != null}">
+                <span>📅</span>
+                <span th:text="'First published: ' + ${book.firstPublishYear}">1997</span>
+            </div>
+
+            <div class="meta-item" th:if="${book.numberOfPages != null}">
+                <span>📖</span>
+                <span th:text="${book.numberOfPages} + ' pages'">350 pages</span>
+            </div>
+        </div>
+
+        <p style="font-weight: bold; color: #888; margin-bottom: 8px; font-size: 13px; text-transform: uppercase; letter-spacing: 1px;">Description</p>
         <div class="description-box">
-            <p th:text="${book.description}">Tutaj pojawi się opis pobrany z Open Library...</p>
+            <p th:text="${book.description}">Book description will appear here...</p>
         </div>
 
         <div class="status-area" style="margin-top: 30px;">
@@ -166,27 +188,27 @@
                             th:class="${isSaved} ? 'btn-status-active' : 'btn-add-main'"
                             onclick="toggleAddMenu(this)">
 
-                        <span th:if="${!isSaved}">Dodaj na półkę ▾</span>
+                        <span th:if="${!isSaved}">Add to shelf ▾</span>
 
                         <span th:if="${isSaved}" th:switch="${currentStatus}">
-                    <span th:case="'READING'">📖 Teraz czytam ▾</span>
-                    <span th:case="'TO_READ'">⏳ Chcę przeczytać ▾</span>
-                    <span th:case="'COMPLETED'">✅ Przeczytane ▾</span>
-                    <span th:case="*">Zmień status ▾</span>
-                </span>
+                            <span th:case="'READING'">📖 Currently reading ▾</span>
+                            <span th:case="'TO_READ'">⏳ Want to read ▾</span>
+                            <span th:case="'COMPLETED'">✅ Read ▾</span>
+                            <span th:case="*">Change status ▾</span>
+                        </span>
                     </button>
 
                     <div class="add-menu-options">
-                        <p class="menu-label" th:text="${isSaved} ? 'Zmień status na:' : 'Wybierz półkę:'"></p>
+                        <p class="menu-label" th:text="${isSaved} ? 'Move to:' : 'Select shelf:'"></p>
 
-                        <button type="submit" name="newStatus" value="TO_READ" class="menu-opt" th:if="${currentStatus != 'TO_READ'}">⏳ Chcę przeczytać</button>
-                        <button type="submit" name="newStatus" value="READING" class="menu-opt" th:if="${currentStatus != 'READING'}">📖 Teraz czytam</button>
-                        <button type="submit" name="newStatus" value="COMPLETED" class="menu-opt" th:if="${currentStatus != 'COMPLETED'}">✅ Przeczytane</button>
+                        <button type="submit" name="newStatus" value="TO_READ" class="menu-opt" th:if="${currentStatus != 'TO_READ'}">⏳ Want to read</button>
+                        <button type="submit" name="newStatus" value="READING" class="menu-opt" th:if="${currentStatus != 'READING'}">📖 Currently reading</button>
+                        <button type="submit" name="newStatus" value="COMPLETED" class="menu-opt" th:if="${currentStatus != 'COMPLETED'}">✅ Read</button>
 
                         <div th:if="${isSaved}">
                             <hr style="border: 0; border-top: 1px solid #eee; margin: 5px 0;">
-                            <button type="submit" th:formaction="@{/library/remove}" class="menu-opt" style="color: #ff4b2b;" onclick="return confirm('Usunąć książkę z biblioteki?')">
-                                🗑️ Usuń z biblioteki
+                            <button type="submit" th:formaction="@{/library/remove}" class="menu-opt" style="color: #ff4b2b;" onclick="return confirm('Remove this book from your shelves?')">
+                                🗑️ Remove from library
                             </button>
                         </div>
                     </div>
@@ -195,13 +217,12 @@
         </div>
 
         <div th:if="${isSaved}">
-            <p style="margin-top: 20px; color: #2ecc71; font-weight: bold;">✓ Masz tę książkę w swojej bibliotece</p>
+            <p style="margin-top: 20px; color: #2ecc71; font-weight: bold;">✓ This book is on your shelf</p>
         </div>
     </div>
 </div>
 
 <script>
-    // MENU NAVBAR
     const trigger = document.getElementById('userMenuTrigger');
     const menu = document.getElementById('dropdownMenu');
 
@@ -210,19 +231,13 @@
         menu.classList.toggle('active');
     });
 
-    // MENU DODAWANIA DO PÓŁEK
     function toggleAddMenu(btn) {
-        // Zatrzymujemy propagację, aby kliknięcie w przycisk nie odpaliło window.onclick
         if (event) event.stopPropagation();
-
         const addMenu = btn.nextElementSibling;
-        // Przełączamy widoczność (toggle)
         addMenu.classList.toggle('show');
     }
 
-
     window.onclick = function(event) {
-        // Zamykanie menu profilu (Navbar)
         if (!event.target.closest('#userMenuTrigger')) {
             if (menu && menu.classList.contains('active')) {
                 menu.classList.remove('active');
@@ -239,6 +254,5 @@
         }
     };
 </script>
-
 </body>
 </html>

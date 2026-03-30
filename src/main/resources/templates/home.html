@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Strona Główna - BookNook</title>
+    <title>Home - BookNook</title>
 
     <link rel="stylesheet" th:href="@{/css/common.css}">
 
     <style>
-
         .main-content {
             min-height: calc(100vh - 70px);
             display: flex;
@@ -33,10 +32,6 @@
             flex-direction: column;
             align-items: center;
             gap: 20px;
-            width: 100%;
-        }
-
-        .search-input-wrapper {
             width: 100%;
         }
 
@@ -73,13 +68,23 @@
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(118, 75, 162, 0.3);
         }
+
+        .home-header h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .home-header p {
+            color: #777;
+            margin-bottom: 30px;
+        }
     </style>
 </head>
 <body>
 
 <nav class="navbar">
     <div class="nav-left">
-        <a th:href="@{/library/my-library}" class="btn-library">Twoja Biblioteczka</a>
+        <a th:href="@{/library/my-library}" class="btn-library">Your Library</a>
     </div>
 
     <div class="nav-center">
@@ -87,16 +92,16 @@
     </div>
 
     <div class="nav-right" id="userMenuTrigger">
-        <span class="user-greeting" th:text="'Witaj, ' + ${username}">Witaj, Użytkowniku</span>
+        <span class="user-greeting" th:text="'Hello, ' + ${username}">Hello, User</span>
         <div class="avatar">👤</div>
 
         <div class="dropdown-menu" id="dropdownMenu">
-            <a href="#" class="dropdown-item">Statystyki</a>
-            <a href="#" class="dropdown-item">Ustawienia profilu</a>
-            <a href="#" class="dropdown-item">Znajomi</a>
+            <a href="#" class="dropdown-item">Statistics</a>
+            <a href="#" class="dropdown-item">Profile Settings</a>
+            <a href="#" class="dropdown-item">Friends</a>
 
             <form th:action="@{/logout}" method="post">
-                <button type="submit" class="dropdown-item logout-btn">Wyloguj się</button>
+                <button type="submit" class="dropdown-item logout-btn">Log out</button>
             </form>
         </div>
     </div>
@@ -105,16 +110,16 @@
 <div class="main-content">
     <div class="search-container">
         <div class="home-header">
-            <h1>Znajdź nową książkę</h1>
-            <p>Przeszukaj bazę książek i dodaj pozycje do swojej kolekcji</p>
+            <h1>Find your next book</h1>
+            <p>Search our database and add books onto your shelves</p>
         </div>
 
         <form th:action="@{/search}" method="get" class="search-form">
-            <div class="search-input-wrapper">
+            <div class="search-input-wrapper" style="width: 100%;">
                 <input type="text" name="query" class="search-bar"
-                       placeholder="Wpisz tytuł, autora lub ISBN..." required>
+                       placeholder="Enter title, author or ISBN..." required>
             </div>
-            <button type="submit" class="btn-search">Szukaj</button>
+            <button type="submit" class="btn-search">Search</button>
         </form>
     </div>
 </div>
@@ -128,9 +133,10 @@
         menu.classList.toggle('active');
     });
 
-    // Zamknij menu po kliknięciu poza nie
     document.addEventListener('click', function() {
-        menu.classList.remove('active');
+        if (menu.classList.contains('active')) {
+            menu.classList.remove('active');
+        }
     });
 </script>
 </body>

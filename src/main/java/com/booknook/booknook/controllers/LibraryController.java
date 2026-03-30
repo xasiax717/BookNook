@@ -19,6 +19,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/library")
@@ -162,13 +163,25 @@ public class LibraryController {
             book.setAuthors(authors);
         }
 
-        // 2. SPRAWDZANIE STATUSU UŻYTKOWNIKA (To jest klucz do Twojego pytania)
+        Map<String, Object> extraDetails = openLibraryService.fetchBookDetails(id);
+
+        // Przypisujemy pobrane dane do obiektu book
+        book.setDescription((String) extraDetails.get("description"));
+
+        if (extraDetails.get("firstPublishYear") != null) {
+            book.setFirstPublishYear((Integer) extraDetails.get("firstPublishYear"));
+        }
+
+        if (extraDetails.get("numberOfPages") != null) {
+            book.setNumberOfPages((Integer) extraDetails.get("numberOfPages"));
+        }
+
         if (principal != null) {
             model.addAttribute("username", principal.getName());
             User user = userRepository.findByUsername(principal.getName()).orElse(null);
 
+            // Ważne: relację sprawdzamy tylko jeśli książka już istnieje w naszej bazie (ma ID)
             if (user != null && book.getId() != null) {
-                // Szukamy, czy ta konkretna książka jest na półce tego użytkownika
                 var userBookOpt = userBookRepository.findByUserAndBook(user, book);
                 if (userBookOpt.isPresent()) {
                     model.addAttribute("isSaved", true);
@@ -182,10 +195,9 @@ public class LibraryController {
             }
         }
 
-        String description = openLibraryService.fetchDescription(id);
-        book.setDescription(description);
         model.addAttribute("book", book);
-
+        System.out.println("DEBUG: Rok z API: " + extraDetails.get("firstPublishYear"));
+        System.out.println("DEBUG: Strony z API: " + extraDetails.get("numberOfPages"));
         return "book-details";
     }
 }

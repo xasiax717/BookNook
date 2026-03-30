@@ -59,7 +59,7 @@ public class BookService {
                         seenKeys.add(doc.getKey());
                     }
 
-                    if (books.size() >= 30) break; // Zwiększamy limit do 30, żeby Harry miał wszystkie części
+                    if (books.size() >= 30) break;
                 }
             }
             return books;
@@ -76,7 +76,7 @@ public class BookService {
         book.setAuthors(doc.getAuthorName() != null ? String.join(", ", doc.getAuthorName()) : "Nieznany autor");
 
         if (doc.getFirstPublishYear() != null) {
-            book.setPublishedYear(String.valueOf(doc.getFirstPublishYear()));
+            book.setFirstPublishYear(doc.getFirstPublishYear());
         }
 
         if (doc.getCoverI() != null) {

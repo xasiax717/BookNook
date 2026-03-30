@@ -3,15 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Moja Biblioteczka - BookNook</title>
+    <title>My Shelves - BookNook</title>
 
     <link rel="stylesheet" th:href="@{/css/common.css}">
 
     <style>
-
         .container { max-width: 1200px; margin: 0 auto; padding: 20px; margin-top: 80px; }
 
-        /* Styl Półek */
+        /* Shelf Styling */
         .shelf-container { margin-bottom: 50px; }
         .shelf-title {
             color: white;
@@ -29,7 +28,7 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
         }
 
-        /* Siatka i Karty */
+        /* Grid and Cards */
         .grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
@@ -78,7 +77,7 @@
             text-overflow: ellipsis;
         }
 
-        /* Menu Akcji (Kebab Menu na kartach) */
+        /* Action Menu (Kebab Menu) */
         .card-actions {
             position: absolute;
             top: 15px;
@@ -151,19 +150,19 @@
 
 <nav class="navbar">
     <div class="nav-left">
-        <a href="/home" class="btn-back">← Powrót </a>
+        <a href="/home" class="btn-back">← Back</a>
     </div>
     <div class="nav-center"><h1>BookNook</h1></div>
     <div class="nav-right" id="userMenuTrigger">
-        <span class="user-greeting" th:text="'Witaj, ' + ${username}">Witaj!</span>
+        <span class="user-greeting" th:text="'Hello, ' + ${username}">Hello!</span>
         <div class="avatar">👤</div>
         <div class="dropdown-menu" id="dropdownMenu">
-            <a href="#" class="dropdown-item">Statystyki</a>
-            <a href="#" class="dropdown-item">Ustawienia profilu</a>
-            <a href="#" class="dropdown-item">Znajomi</a>
+            <a href="#" class="dropdown-item">Statistics</a>
+            <a href="#" class="dropdown-item">Profile Settings</a>
+            <a href="#" class="dropdown-item">Friends</a>
 
             <form th:action="@{/logout}" method="post">
-                <button type="submit" class="dropdown-item logout-btn">Wyloguj się</button>
+                <button type="submit" class="dropdown-item logout-btn">Log out</button>
             </form>
         </div>
     </div>
@@ -172,117 +171,116 @@
 <div class="container">
 
     <div class="shelf-container">
-        <h2 class="shelf-title">📖 Teraz czytam</h2>
+        <h2 class="shelf-title">📖 Currently Reading</h2>
         <div class="shelf-paper">
             <div class="grid">
                 <div th:each="userBook : ${userBooks}" th:if="${userBook.status == 'READING'}" class="card">
                     <div class="card-actions">
                         <button class="btn-actions" onclick="toggleActionMenu(this)">⋮</button>
                         <div class="action-menu">
-                            <p class="menu-label">Zmień status na:</p>
+                            <p class="menu-label">Move to:</p>
                             <form th:action="@{/library/update-status}" method="post">
                                 <input type="hidden" name="userBookId" th:value="${userBook.id}">
-                                <button type="submit" name="newStatus" value="TO_READ" class="menu-opt">⏳ Chcę przeczytać</button>
-                                <button type="submit" name="newStatus" value="COMPLETED" class="menu-opt">✅ Przeczytane</button>
+                                <button type="submit" name="newStatus" value="TO_READ" class="menu-opt">⏳ Want to read</button>
+                                <button type="submit" name="newStatus" value="COMPLETED" class="menu-opt">✅ Read</button>
                             </form>
                             <hr>
                             <form th:action="@{/library/remove}" method="post">
                                 <input type="hidden" name="userBookId" th:value="${userBook.id}">
-                                <button type="submit" class="menu-opt opt-remove" onclick="return confirm('Usunąć tę książkę?')">🗑️ Usuń</button>
+                                <button type="submit" class="menu-opt opt-remove" onclick="return confirm('Remove this book from your shelves?')">🗑️ Remove</button>
                             </form>
                         </div>
                     </div>
 
                     <a th:href="@{/library/book-details(id=${userBook.book.externalId})}" style="text-decoration: none;">
-                        <img th:src="${userBook.book.coverUrl != null ? userBook.book.coverUrl : 'https://via.placeholder.com/180x250?text=Brak+Okładki'}" alt="Okładka">
+                        <img th:src="${userBook.book.coverUrl != null ? userBook.book.coverUrl : 'https://via.placeholder.com/180x250?text=No+Cover'}" alt="Cover">
                     </a>
 
                     <a th:href="@{/library/book-details(id=${userBook.book.externalId})}" style="text-decoration: none;">
-                        <div class="book-title" th:title="${userBook.book.title}" th:text="${userBook.book.title}" style="color: #333;">Tytuł</div>
+                        <div class="book-title" th:title="${userBook.book.title}" th:text="${userBook.book.title}" style="color: #333;">Title</div>
                     </a>
-                    <div class="book-author" th:text="${userBook.book.authors}">Autor</div>
+                    <div class="book-author" th:text="${userBook.book.authors}">Author</div>
                 </div>
             </div>
-            <p th:if="${#lists.isEmpty(userBooks.?[status == 'READING'])}" class="empty-msg">Brak książek w tej sekcji.</p>
+            <p th:if="${#lists.isEmpty(userBooks.?[status == 'READING'])}" class="empty-msg">No books in this section yet.</p>
         </div>
     </div>
 
     <div class="shelf-container">
-        <h2 class="shelf-title">⏳ Chcę przeczytać</h2>
+        <h2 class="shelf-title">⏳ Want to Read</h2>
         <div class="shelf-paper">
             <div class="grid">
                 <div th:each="userBook : ${userBooks}" th:if="${userBook.status == 'TO_READ'}" class="card">
                     <div class="card-actions">
                         <button class="btn-actions" onclick="toggleActionMenu(this)">⋮</button>
                         <div class="action-menu">
-                            <p class="menu-label">Zmień status na:</p>
+                            <p class="menu-label">Move to:</p>
                             <form th:action="@{/library/update-status}" method="post">
                                 <input type="hidden" name="userBookId" th:value="${userBook.id}">
-                                <button type="submit" name="newStatus" value="READING" class="menu-opt">📖 Teraz czytam</button>
-                                <button type="submit" name="newStatus" value="COMPLETED" class="menu-opt">✅ Przeczytane</button>
+                                <button type="submit" name="newStatus" value="READING" class="menu-opt">📖 Currently reading</button>
+                                <button type="submit" name="newStatus" value="COMPLETED" class="menu-opt">✅ Read</button>
                             </form>
                             <hr>
                             <form th:action="@{/library/remove}" method="post">
                                 <input type="hidden" name="userBookId" th:value="${userBook.id}">
-                                <button type="submit" class="menu-opt opt-remove">🗑️ Usuń</button>
+                                <button type="submit" class="menu-opt opt-remove" onclick="return confirm('Remove this book from your shelves?')">🗑️ Remove</button>
                             </form>
                         </div>
                     </div>
 
                     <a th:href="@{/library/book-details(id=${userBook.book.externalId})}" style="text-decoration: none;">
-                        <img th:src="${userBook.book.coverUrl != null ? userBook.book.coverUrl : 'https://via.placeholder.com/180x250?text=Brak+Okładki'}" alt="Okładka">
+                        <img th:src="${userBook.book.coverUrl != null ? userBook.book.coverUrl : 'https://via.placeholder.com/180x250?text=No+Cover'}" alt="Cover">
                     </a>
 
                     <a th:href="@{/library/book-details(id=${userBook.book.externalId})}" style="text-decoration: none;">
-                        <div class="book-title" th:title="${userBook.book.title}" th:text="${userBook.book.title}" style="color: #333;">Tytuł</div>
+                        <div class="book-title" th:title="${userBook.book.title}" th:text="${userBook.book.title}" style="color: #333;">Title</div>
                     </a>
-                    <div class="book-author" th:text="${userBook.book.authors}">Autor</div>
+                    <div class="book-author" th:text="${userBook.book.authors}">Author</div>
                 </div>
             </div>
-            <p th:if="${#lists.isEmpty(userBooks.?[status == 'TO_READ'])}" class="empty-msg">Brak książek w tej sekcji.</p>
+            <p th:if="${#lists.isEmpty(userBooks.?[status == 'TO_READ'])}" class="empty-msg">No books in this section yet.</p>
         </div>
     </div>
 
     <div class="shelf-container">
-        <h2 class="shelf-title">✅ Przeczytane</h2>
+        <h2 class="shelf-title">✅ Read</h2>
         <div class="shelf-paper">
             <div class="grid">
                 <div th:each="userBook : ${userBooks}" th:if="${userBook.status == 'COMPLETED'}" class="card">
                     <div class="card-actions">
                         <button class="btn-actions" onclick="toggleActionMenu(this)">⋮</button>
                         <div class="action-menu">
-                            <p class="menu-label">Zmień status na:</p>
+                            <p class="menu-label">Move to:</p>
                             <form th:action="@{/library/update-status}" method="post">
                                 <input type="hidden" name="userBookId" th:value="${userBook.id}">
-                                <button type="submit" name="newStatus" value="READING" class="menu-opt">📖 Teraz czytam</button>
-                                <button type="submit" name="newStatus" value="TO_READ" class="menu-opt">⏳ Chcę przeczytać</button>
+                                <button type="submit" name="newStatus" value="READING" class="menu-opt">📖 Currently reading</button>
+                                <button type="submit" name="newStatus" value="TO_READ" class="menu-opt">⏳ Want to read</button>
                             </form>
                             <hr>
                             <form th:action="@{/library/remove}" method="post">
                                 <input type="hidden" name="userBookId" th:value="${userBook.id}">
-                                <button type="submit" class="menu-opt opt-remove">🗑️ Usuń</button>
+                                <button type="submit" class="menu-opt opt-remove" onclick="return confirm('Remove this book from your shelves?')">🗑️ Remove</button>
                             </form>
                         </div>
                     </div>
 
                     <a th:href="@{/library/book-details(id=${userBook.book.externalId})}" style="text-decoration: none;">
-                        <img th:src="${userBook.book.coverUrl != null ? userBook.book.coverUrl : 'https://via.placeholder.com/180x250?text=Brak+Okładki'}" alt="Okładka">
+                        <img th:src="${userBook.book.coverUrl != null ? userBook.book.coverUrl : 'https://via.placeholder.com/180x250?text=No+Cover'}" alt="Cover">
                     </a>
 
                     <a th:href="@{/library/book-details(id=${userBook.book.externalId})}" style="text-decoration: none;">
-                        <div class="book-title" th:title="${userBook.book.title}" th:text="${userBook.book.title}" style="color: #333;">Tytuł</div>
+                        <div class="book-title" th:title="${userBook.book.title}" th:text="${userBook.book.title}" style="color: #333;">Title</div>
                     </a>
-                    <div class="book-author" th:text="${userBook.book.authors}">Autor</div>
+                    <div class="book-author" th:text="${userBook.book.authors}">Author</div>
                 </div>
             </div>
-            <p th:if="${#lists.isEmpty(userBooks.?[status == 'COMPLETED'])}" class="empty-msg">Brak książek w tej sekcji.</p>
+            <p th:if="${#lists.isEmpty(userBooks.?[status == 'COMPLETED'])}" class="empty-msg">No books in this section yet.</p>
         </div>
     </div>
 
 </div>
 
 <script>
-    // Menu profilu (Navbar)
     const trigger = document.getElementById('userMenuTrigger');
     const menu = document.getElementById('dropdownMenu');
     trigger.addEventListener('click', function(e) {
@@ -290,17 +288,13 @@
         menu.classList.toggle('active');
     });
 
-    // Menu akcji książki (Trzy kropki)
     function toggleActionMenu(btn) {
-        // Zamyka inne otwarte menu akcji
         document.querySelectorAll('.action-menu').forEach(m => {
             if (m !== btn.nextElementSibling) m.classList.remove('show');
         });
-        // Przełącza obecne
         btn.nextElementSibling.classList.toggle('show');
     }
 
-    // Zamknij wszystkie menu po kliknięciu poza nimi
     document.addEventListener('click', function(e) {
         if (!e.target.closest('.card-actions')) {
             document.querySelectorAll('.action-menu').forEach(m => m.classList.remove('show'));
