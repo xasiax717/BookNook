@@ -7,6 +7,7 @@ import com.booknook.booknook.repositories.BookRepository;
 import com.booknook.booknook.repositories.UserBookRepository;
 import com.booknook.booknook.repositories.UserRepository;
 import com.booknook.booknook.services.OpenLibraryService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -140,10 +141,24 @@ public class LibraryController {
     }
 
     @PostMapping("/remove")
-    public String removeBookFromLibrary(@RequestParam Long userBookId, RedirectAttributes redirectAttributes) {
-        userBookRepository.deleteById(userBookId);
+    public String removeBookFromLibrary(@RequestParam Long userBookId,
+                                        @RequestParam(value = "newStatus", required = false) String newStatus,
+                                        @RequestParam(defaultValue = "false") boolean fromDetails,
+                                        Principal principal) {
+        try {
+            // Pobieramy ID książki zanim ją usuniemy, żeby wiedzieć gdzie wrócić
+            UserBook ub = userBookRepository.findById(userBookId).orElse(null);
+            String bookExternalId = (ub != null) ? ub.getBook().getExternalId() : "";
 
-        redirectAttributes.addFlashAttribute("message", "Usunięto książkę z Twojej biblioteczki.");
+            userBookRepository.deleteById(userBookId);
+
+            if (fromDetails && !bookExternalId.isEmpty()) {
+                // Wracamy na detale używając tylko ID - resztę dociągnie sobie sam GET
+                return "redirect:/library/book-details?id=" + bookExternalId;
+            }
+        } catch (Exception e) {
+            System.err.println("Error: " + e.getMessage());
+        }
         return "redirect:/library/my-library";
     }
     @GetMapping("/book-details")

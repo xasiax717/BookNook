@@ -175,45 +175,67 @@
         </div>
 
         <div class="status-area" style="margin-top: 30px;">
-            <form th:action="${isSaved} ? @{/library/update-status} : @{/library/add}" method="post">
-                <input type="hidden" name="externalId" th:value="${book.externalId}">
-                <input type="hidden" name="title" th:value="${book.title}">
-                <input type="hidden" name="authors" th:value="${book.authors}">
-                <input type="hidden" name="coverUrl" th:value="${book.coverUrl}">
-                <input type="hidden" name="fromDetails" value="true">
-                <input type="hidden" name="userBookId" th:if="${isSaved}" th:value="${userBookId}">
+            <div class="dropdown-add">
+                <button type="button"
+                        th:class="${isSaved} ? 'btn-status-active' : 'btn-add-main'"
+                        onclick="toggleAddMenu(this)">
 
-                <div class="dropdown-add">
-                    <button type="button"
-                            th:class="${isSaved} ? 'btn-status-active' : 'btn-add-main'"
-                            onclick="toggleAddMenu(this)">
+                    <span th:if="${!isSaved}">Add to shelf ▾</span>
 
-                        <span th:if="${!isSaved}">Add to shelf ▾</span>
+                    <span th:if="${isSaved}" th:switch="${currentStatus}">
+                <span th:case="'READING'">📖 Currently reading ▾</span>
+                <span th:case="'TO_READ'">⏳ Want to read ▾</span>
+                <span th:case="'COMPLETED'">✅ Read ▾</span>
+                <span th:case="*">Change status ▾</span>
+            </span>
+                </button>
 
-                        <span th:if="${isSaved}" th:switch="${currentStatus}">
-                            <span th:case="'READING'">📖 Currently reading ▾</span>
-                            <span th:case="'TO_READ'">⏳ Want to read ▾</span>
-                            <span th:case="'COMPLETED'">✅ Read ▾</span>
-                            <span th:case="*">Change status ▾</span>
-                        </span>
-                    </button>
+                <div class="add-menu-options">
+                    <p class="menu-label" th:text="${isSaved} ? 'Move to:' : 'Select shelf:'"></p>
 
-                    <div class="add-menu-options">
-                        <p class="menu-label" th:text="${isSaved} ? 'Move to:' : 'Select shelf:'"></p>
+                    <form th:if="${currentStatus != 'TO_READ'}" th:action="${isSaved} ? @{/library/update-status} : @{/library/add}" method="post">
+                        <input type="hidden" name="externalId" th:value="${book.externalId}">
+                        <input type="hidden" name="title" th:value="${book.title}">
+                        <input type="hidden" name="authors" th:value="${book.authors}">
+                        <input type="hidden" name="coverUrl" th:value="${book.coverUrl}">
+                        <input type="hidden" name="fromDetails" value="true">
+                        <input type="hidden" name="userBookId" th:if="${isSaved}" th:value="${userBookId}">
+                        <button type="submit" name="newStatus" value="TO_READ" class="menu-opt">⏳ Want to read</button>
+                    </form>
 
-                        <button type="submit" name="newStatus" value="TO_READ" class="menu-opt" th:if="${currentStatus != 'TO_READ'}">⏳ Want to read</button>
-                        <button type="submit" name="newStatus" value="READING" class="menu-opt" th:if="${currentStatus != 'READING'}">📖 Currently reading</button>
-                        <button type="submit" name="newStatus" value="COMPLETED" class="menu-opt" th:if="${currentStatus != 'COMPLETED'}">✅ Read</button>
+                    <form th:if="${currentStatus != 'READING'}" th:action="${isSaved} ? @{/library/update-status} : @{/library/add}" method="post">
+                        <input type="hidden" name="externalId" th:value="${book.externalId}">
+                        <input type="hidden" name="title" th:value="${book.title}">
+                        <input type="hidden" name="authors" th:value="${book.authors}">
+                        <input type="hidden" name="coverUrl" th:value="${book.coverUrl}">
+                        <input type="hidden" name="fromDetails" value="true">
+                        <input type="hidden" name="userBookId" th:if="${isSaved}" th:value="${userBookId}">
+                        <button type="submit" name="newStatus" value="READING" class="menu-opt">📖 Currently reading</button>
+                    </form>
 
-                        <div th:if="${isSaved}">
-                            <hr style="border: 0; border-top: 1px solid #eee; margin: 5px 0;">
-                            <button type="submit" th:formaction="@{/library/remove}" class="menu-opt" style="color: #ff4b2b;" onclick="return confirm('Remove this book from your shelves?')">
+                    <form th:if="${currentStatus != 'COMPLETED'}" th:action="${isSaved} ? @{/library/update-status} : @{/library/add}" method="post">
+                        <input type="hidden" name="externalId" th:value="${book.externalId}">
+                        <input type="hidden" name="title" th:value="${book.title}">
+                        <input type="hidden" name="authors" th:value="${book.authors}">
+                        <input type="hidden" name="coverUrl" th:value="${book.coverUrl}">
+                        <input type="hidden" name="fromDetails" value="true">
+                        <input type="hidden" name="userBookId" th:if="${isSaved}" th:value="${userBookId}">
+                        <button type="submit" name="newStatus" value="COMPLETED" class="menu-opt">✅ Read</button>
+                    </form>
+
+                    <div th:if="${isSaved}">
+                        <hr style="border: 0; border-top: 1px solid #eee; margin: 5px 0;">
+                        <form th:action="@{/library/remove}" method="post">
+                            <input type="hidden" name="userBookId" th:value="${userBookId}">
+                            <input type="hidden" name="fromDetails" value="true">
+                            <button type="submit" class="menu-opt" style="color: #ff4b2b;"
+                                    onclick="return confirm('Remove this book from your shelves?')">
                                 🗑️ Remove from library
                             </button>
-                        </div>
+                        </form>
                     </div>
                 </div>
-            </form>
+            </div>
         </div>
 
         <div th:if="${isSaved}">
