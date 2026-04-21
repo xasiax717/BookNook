@@ -8,6 +8,7 @@ import com.booknook.booknook.repositories.UserBookRepository;
 import com.booknook.booknook.repositories.UserRepository;
 import com.booknook.booknook.services.OpenLibraryService;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -48,7 +49,9 @@ public class LibraryController {
             @RequestParam String authors,
             @RequestParam(required = false) String coverUrl,
             @RequestParam String newStatus,
-            @RequestParam(defaultValue = "false") boolean fromDetails, // Ustawiamy domyślną wartość
+            @RequestParam Integer numberOfPages,
+            @RequestParam(defaultValue = "false") boolean fromDetails,
+            // Ustawiamy domyślną wartość
             Principal principal,
             RedirectAttributes redirectAttributes) {
 
@@ -67,6 +70,7 @@ public class LibraryController {
                 newBook.setTitle(title);
                 newBook.setAuthors(authors);
                 newBook.setCoverUrl(coverUrl);
+                newBook.setNumberOfPages(numberOfPages);
                 return bookRepository.save(newBook);
             });
 
@@ -130,6 +134,8 @@ public class LibraryController {
         userBook.setStatus(newStatus);
         userBookRepository.save(userBook);
 
+        updateUserPages(userBook.getUser(), newStatus);
+
         redirectAttributes.addFlashAttribute("message", "Zmieniono status książki!");
 
         if (fromDetails) {
@@ -161,6 +167,7 @@ public class LibraryController {
         }
         return "redirect:/library/my-library";
     }
+
     @GetMapping("/book-details")
     public String showBookDetails(@RequestParam String id,
                                   @RequestParam(required = false) String coverUrl,
@@ -214,5 +221,88 @@ public class LibraryController {
         System.out.println("DEBUG: Rok z API: " + extraDetails.get("firstPublishYear"));
         System.out.println("DEBUG: Strony z API: " + extraDetails.get("numberOfPages"));
         return "book-details";
+    }
+
+    @PostMapping("/api/add")
+    @org.springframework.web.bind.annotation.ResponseBody
+    public org.springframework.http.ResponseEntity<?> addApi(
+            @RequestParam String externalId,
+            @RequestParam String title,
+            @RequestParam String authors,
+            @RequestParam(required = false) String coverUrl,
+            @RequestParam String newStatus,
+            @RequestParam Integer numberOfPages,
+            Principal principal) {
+        try {
+            User user = userRepository.findByUsername(principal.getName()).orElseThrow();
+
+            // Ta sama logika co w Twoim add - szukamy lub tworzymy książkę
+            Book book = bookRepository.findByExternalId(externalId).orElseGet(() -> {
+                Book newBook = new Book();
+                newBook.setExternalId(externalId);
+                newBook.setTitle(title);
+                newBook.setAuthors(authors);
+                newBook.setCoverUrl(coverUrl);
+                newBook.setNumberOfPages(numberOfPages);
+                return bookRepository.save(newBook);
+            });
+
+            UserBook userBook = userBookRepository.findByUserAndBook(user, book)
+                    .orElse(new UserBook());
+
+            userBook.setUser(user);
+            userBook.setBook(book);
+            userBook.setStatus(newStatus);
+            userBook.setAddedAt(LocalDateTime.now());
+
+            UserBook saved = userBookRepository.save(userBook);
+
+            updateUserPages(user, newStatus); // AKTUALIZACJA LICZNIKA
+
+            // Zwracamy JSON z danymi, które JS wykorzysta do podmiany przycisku
+            return org.springframework.http.ResponseEntity.ok(Map.of(
+                    "status", "success",
+                    "newStatus", newStatus,
+                    "userBookId", saved.getId()
+            ));
+        } catch (Exception e) {
+            return org.springframework.http.ResponseEntity.badRequest().body(Map.of("status", "error"));
+        }
+    }
+
+    @PostMapping("/api/remove")
+    @org.springframework.web.bind.annotation.ResponseBody
+    public org.springframework.http.ResponseEntity<?> removeApi(@RequestParam Long userBookId) {
+        try {
+            // 1. Najpierw znajdujemy UserBook, żeby wiedzieć, czyj licznik aktualizować
+            UserBook ub = userBookRepository.findById(userBookId).orElse(null);
+
+            if (ub != null) {
+                User owner = ub.getUser();
+
+                // 2. Usuwamy powiązanie
+                userBookRepository.delete(ub);
+
+                //updateUserPages(owner);
+
+                // 4. Dopiero teraz zwracamy odpowiedź (to musi być ostatnie!)
+                return org.springframework.http.ResponseEntity.ok(Map.of("status", "deleted"));
+            }
+
+            return org.springframework.http.ResponseEntity.badRequest().body(Map.of("status", "not_found"));
+
+        } catch (Exception e) {
+            return org.springframework.http.ResponseEntity.badRequest().body(Map.of("status", "error"));
+        }
+    }
+
+    private void updateUserPages(User user, String newStatus) {
+        int totalPages = userBookRepository.findByUser(user).stream()
+                .filter(ub -> "COMPLETED".equals(ub.getStatus()))
+                .mapToInt(ub -> ub.getBook().getNumberOfPages() != null ? ub.getBook().getNumberOfPages() : 0)
+                .sum();
+        user.setTotalPagesRead(totalPages);
+        userRepository.save(user);
+
     }
 }

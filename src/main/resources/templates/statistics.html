@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Statistics</title>
+    <link rel="stylesheet" th:href="@{/css/common.css}">
+    <style>
+        .stats-container { max-width: 1000px; margin: 80px auto; padding: 20px; }
+        .stats-header { margin-bottom: 40px; text-align: center; }
+        .stats-header h1 { color: #333; font-size: 32px; }
+
+        .main-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 25px; margin-bottom: 40px; }
+
+        .stat-card { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); text-align: center; transition: 0.3s; }
+        .stat-card:hover { transform: translateY(-5px); }
+        .stat-value { font-size: 40px; font-weight: bold; color: #667eea; display: block; }
+        .stat-label { color: #888; text-transform: uppercase; font-size: 12px; letter-spacing: 1px; margin-top: 10px; }
+
+        .pages-hero {
+            background: white; /* Zmienione z gradientu na biały */
+            color: #333;       /* Ciemny tekst dla kontrastu */
+            padding: 50px;
+            border-radius: 25px;
+            text-align: center;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05); /* Delikatniejszy cień, jak w reszcie kart */
+            border: 1px solid #f0f2ff; /* Opcjonalna delikatna obwódka */
+        }
+
+        .pages-hero h2 {
+            font-size: 18px;
+            color: #888; /* Szary kolor dla nagłówka, jak w stat-label */
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .pages-hero .huge-number {
+            font-size: 72px;
+            font-weight: 800;
+            color: #667eea; /* Ten sam niebieski/fioletowy co w stat-value */
+        }
+
+        /* Styl dla tekstu pod wielką liczbą */
+        .pages-hero p {
+            margin-top: 15px;
+            font-size: 18px;
+            color: #666; /* Spokojniejszy szary */
+        }
+        .stats-header h1 {
+            color: white;
+            font-size: 32px;
+        }
+        .stats-header p {
+            color: rgba(255, 255, 255, 0.8) !important;
+            font-size: 16px;
+        }
+
+        .progress-section { background: white; padding: 40px; border-radius: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
+        .progress-bar-container { background: #f0f2ff; height: 12px; border-radius: 6px; margin: 20px 0; overflow: hidden; }
+        .progress-fill { background: #667eea; height: 100%; transition: width 1s ease-in-out; }
+    </style>
+</head>
+<body>
+<nav class="navbar">
+    <div class="nav-left">
+        <a href="/home" style="text-decoration: none; color: #667eea; font-weight: bold;">← Back</a>
+    </div>
+    <div class="nav-center">
+        <h1>BookNook</h1>
+    </div>
+
+    <div class="nav-right" id="userMenuTrigger">
+        <span class="user-greeting" th:text="'Hello, ' + ${username}">Hello, User</span>
+        <div class="avatar">👤</div>
+
+        <div class="dropdown-menu" id="dropdownMenu">
+            <a href="#" class="dropdown-item">Statistics</a>
+            <a href="#" class="dropdown-item">Profile Settings</a>
+            <a href="#" class="dropdown-item">Friends</a>
+
+            <form th:action="@{/logout}" method="post">
+                <button type="submit" class="dropdown-item logout-btn">Log out</button>
+            </form>
+        </div>
+    </div>
+</nav>
+
+<div class="stats-container">
+    <div class="stats-header">
+        <h1>Your Reading Journey</h1>
+        <p>Track your progress and celebrate every page.</p>
+    </div>
+
+    <div class="pages-hero">
+        <h2>Total Pages Read</h2>
+        <div class="huge-number" th:text="${totalPages}">0</div>
+        <p style="margin-top: 15px; font-size: 18px;">That's an incredible achievement!</p>
+    </div>
+
+    <div class="main-grid">
+        <div class="stat-card">
+            <span class="stat-value" th:text="${total}">0</span>
+            <span class="stat-label">Books in Library</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-value" th:text="${completed}">0</span>
+            <span class="stat-label">Finished</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-value" th:text="${reading}">0</span>
+            <span class="stat-label">Currently Reading</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-value" th:text="${toRead}">0</span>
+            <span class="stat-label">Want to Read</span>
+        </div>
+    </div>
+
+    <div class="progress-section">
+        <h3 style="margin-bottom: 10px;">Library Completion</h3>
+        <p style="font-size: 14px; color: #666;">You have finished <strong
+                th:text="${total > 0 ? (completed * 100 / total) : 0}">0</strong>% of your collection.</p>
+        <div class="progress-bar-container">
+            <div class="progress-fill" th:style="'width: ' + ${total > 0 ? (completed * 100 / total) : 0} + '%'"></div>
+        </div>
+    </div>
+</div>
+<script>
+    const trigger = document.getElementById('userMenuTrigger');
+    const menu = document.getElementById('dropdownMenu');
+
+    trigger.addEventListener('click', function(e) {
+        e.stopPropagation();
+        menu.classList.toggle('active');
+    });
+
+    document.addEventListener('click', function() {
+        if (menu.classList.contains('active')) {
+            menu.classList.remove('active');
+        }
+    });
+</script>
+</body>
+</html>

@@ -39,11 +39,9 @@ public class User {
     @Past(message = "Nieprawidłowa data urodzenia")
     private LocalDate dateOfBirth;
     private String sex;
+    private Integer totalPagesRead = 0;
 
-//    public User(String username, String passwordHash) {
-//        this.username = username;
-//        this.password = password;
-//    }
+
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<UserBook> userBooks = new ArrayList<>();

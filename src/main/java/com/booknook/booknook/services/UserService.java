@@ -48,4 +48,9 @@ public class UserService {
 
         return savedUser;
     }
+
+    public User findByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Użytkownik o nazwie " + username + " nie został znaleziony."));
+    }
 }

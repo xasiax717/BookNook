@@ -3,140 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <title>Book Details - BookNook</title>
     <link rel="stylesheet" th:href="@{/css/common.css}">
     <style>
-        .details-container {
-            max-width: 1000px;
-            margin: 100px auto;
-            background: white;
-            border-radius: 20px;
-            padding: 40px;
-            display: flex;
-            gap: 40px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-        .details-left img {
-            width: 300px;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
+        .details-container { max-width: 1000px; margin: 100px auto; background: white; border-radius: 20px; padding: 40px; display: flex; gap: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        .details-left img { width: 300px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
         .details-right { flex: 1; }
         .details-right h1 { color: #333; margin-bottom: 10px; }
         .details-right h3 { color: #667eea; margin-bottom: 20px; }
-        .description-box {
-            line-height: 1.6;
-            color: #444;
-            background: #f9faff;
-            padding: 20px;
-            border-radius: 10px;
-            border-left: 4px solid #667eea;
-        }
-
-        .dropdown-add { position: relative; }
-
-        .btn-add-main {
-            width: 100%;
-            padding: 12px 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
-            font-size: 16px;
-        }
-
-        .add-menu-options {
-            display: none;
-            position: absolute;
-            top: 100%;
-            left: 0;
-            width: 100%;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-            z-index: 100;
-            margin-top: 5px;
-        }
-
+        .description-box { line-height: 1.6; color: #444; background: #f9faff; padding: 20px; border-radius: 10px; border-left: 4px solid #667eea; }
+        .dropdown-add { position: relative; display: inline-block; }
+        .btn-add-main { width: 100%; padding: 12px 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; font-size: 16px; }
+        .add-menu-options { display: none; position: absolute; top: 100%; left: 0; width: 280px; background: white; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); z-index: 100; margin-top: 5px; }
         .add-menu-options.show { display: flex; flex-direction: column; }
-
-        .menu-opt {
-            padding: 12px 15px;
-            border: none;
-            background: none;
-            text-align: left;
-            cursor: pointer;
-            font-size: 14px;
-            transition: 0.2s;
-            color: #444;
-        }
-
+        .menu-opt { padding: 12px 15px; border: none; background: none; text-align: left; cursor: pointer; font-size: 14px; transition: 0.2s; color: #444; width: 100%; }
         .menu-opt:hover { background: #f0f2ff; color: #667eea; }
-        .menu-opt:not(:last-child) { border-bottom: 1px solid #eee; }
-
-        .btn-status-active {
-            width: 280px;
-            padding: 12px 20px;
-            background: white;
-            color: #667eea;
-            border: 2px solid #667eea;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
-            font-size: 16px;
-            text-align: left;
-        }
-
-        .btn-status-active:hover {
-            background: #f0f2ff;
-        }
-
-        .menu-label {
-            font-size: 11px;
-            color: #999;
-            padding: 10px 15px 5px;
-            text-transform: uppercase;
-            font-weight: bold;
-        }
-
-        .book-metadata {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 25px;
-            flex-wrap: wrap;
-        }
-
-        .meta-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: #f0f2ff;
-            color: #667eea;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: 600;
-            border: 1px solid #e0e6ff;
-        }
+        .btn-status-active { width: 280px; padding: 12px 20px; background: white; color: #667eea; border: 2px solid #667eea; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; font-size: 16px; text-align: left; }
+        .book-metadata { display: flex; gap: 15px; margin-bottom: 25px; flex-wrap: wrap; }
+        .meta-item { display: flex; align-items: center; gap: 8px; background: #f0f2ff; color: #667eea; padding: 6px 14px; border-radius: 20px; font-size: 14px; font-weight: 600; border: 1px solid #e0e6ff; }
+        .menu-label { font-size: 11px; color: #999; padding: 10px 15px 5px; text-transform: uppercase; font-weight: bold; }
     </style>
 </head>
 <body>
 <nav class="navbar">
     <div class="nav-left">
-        <a href="javascript:void(0);" onclick="history.back();" style="text-decoration: none; color: #667eea; font-weight: bold;">← Back</a>
+        <a href="/home" class="btn-back">← Back</a>
     </div>
-    <div class="nav-center">
-        <h1>BookNook</h1>
-    </div>
-
+    <div class="nav-center"><h1>BookNook</h1></div>
     <div class="nav-right" id="userMenuTrigger">
-        <span class="user-greeting" th:text="'Hello, ' + ${username}">Hello, User</span>
+        <span class="user-greeting" th:text="'Hello, ' + ${username}">Hello!</span>
         <div class="avatar">👤</div>
-
         <div class="dropdown-menu" id="dropdownMenu">
             <a href="#" class="dropdown-item">Statistics</a>
             <a href="#" class="dropdown-item">Profile Settings</a>
@@ -159,122 +57,158 @@
 
         <div class="book-metadata">
             <div class="meta-item" th:if="${book.firstPublishYear != null}">
-                <span>📅</span>
-                <span th:text="'First published: ' + ${book.firstPublishYear}">1997</span>
+                <span>📅</span><span th:text="'First published: ' + ${book.firstPublishYear}">1997</span>
             </div>
-
             <div class="meta-item" th:if="${book.numberOfPages != null}">
-                <span>📖</span>
-                <span th:text="${book.numberOfPages} + ' pages'">350 pages</span>
+                <span>📖</span><span th:text="${book.numberOfPages} + ' pages'">350 pages</span>
             </div>
         </div>
 
         <p style="font-weight: bold; color: #888; margin-bottom: 8px; font-size: 13px; text-transform: uppercase; letter-spacing: 1px;">Description</p>
         <div class="description-box">
-            <p th:text="${book.description}">Book description will appear here...</p>
+            <p th:text="${book.description}">Book description...</p>
         </div>
 
         <div class="status-area" style="margin-top: 30px;">
             <div class="dropdown-add">
-                <button type="button"
-                        th:class="${isSaved} ? 'btn-status-active' : 'btn-add-main'"
-                        onclick="toggleAddMenu(this)">
-
-                    <span th:if="${!isSaved}">Add to shelf ▾</span>
-
-                    <span th:if="${isSaved}" th:switch="${currentStatus}">
-                <span th:case="'READING'">📖 Currently reading ▾</span>
-                <span th:case="'TO_READ'">⏳ Want to read ▾</span>
-                <span th:case="'COMPLETED'">✅ Read ▾</span>
-                <span th:case="*">Change status ▾</span>
-            </span>
+                <button type="button" id="mainStatusBtn" th:class="${isSaved} ? 'btn-status-active' : 'btn-add-main'" onclick="toggleAddMenu(event)">
+                    <span id="mainStatusText">
+                    <th:block th:if="${!isSaved}">Add to shelf ▾</th:block>
+                    <th:block th:if="${isSaved}" th:switch="${currentStatus}">
+                        <span th:case="'READING'">📖 Currently reading ▾</span>
+                        <span th:case="'TO_READ'">⏳ Want to read ▾</span>
+                        <span th:case="'COMPLETED'">✅ Read ▾</span>
+                        <span th:case="*">Change status ▾</span>
+                    </th:block>
+                    </span>
                 </button>
 
-                <div class="add-menu-options">
-                    <p class="menu-label" th:text="${isSaved} ? 'Move to:' : 'Select shelf:'"></p>
+                <div class="add-menu-options" id="statusOptions">
+                    <p class="menu-label">Select shelf:</p>
+                    <button type="button" class="menu-opt" onclick="handleAction('TO_READ')">⏳ Want to read</button>
+                    <button type="button" class="menu-opt" onclick="handleAction('READING')">📖 Currently reading</button>
+                    <button type="button" class="menu-opt" onclick="handleAction('COMPLETED')">✅ Read</button>
 
-                    <form th:if="${currentStatus != 'TO_READ'}" th:action="${isSaved} ? @{/library/update-status} : @{/library/add}" method="post">
-                        <input type="hidden" name="externalId" th:value="${book.externalId}">
-                        <input type="hidden" name="title" th:value="${book.title}">
-                        <input type="hidden" name="authors" th:value="${book.authors}">
-                        <input type="hidden" name="coverUrl" th:value="${book.coverUrl}">
-                        <input type="hidden" name="fromDetails" value="true">
-                        <input type="hidden" name="userBookId" th:if="${isSaved}" th:value="${userBookId}">
-                        <button type="submit" name="newStatus" value="TO_READ" class="menu-opt">⏳ Want to read</button>
-                    </form>
-
-                    <form th:if="${currentStatus != 'READING'}" th:action="${isSaved} ? @{/library/update-status} : @{/library/add}" method="post">
-                        <input type="hidden" name="externalId" th:value="${book.externalId}">
-                        <input type="hidden" name="title" th:value="${book.title}">
-                        <input type="hidden" name="authors" th:value="${book.authors}">
-                        <input type="hidden" name="coverUrl" th:value="${book.coverUrl}">
-                        <input type="hidden" name="fromDetails" value="true">
-                        <input type="hidden" name="userBookId" th:if="${isSaved}" th:value="${userBookId}">
-                        <button type="submit" name="newStatus" value="READING" class="menu-opt">📖 Currently reading</button>
-                    </form>
-
-                    <form th:if="${currentStatus != 'COMPLETED'}" th:action="${isSaved} ? @{/library/update-status} : @{/library/add}" method="post">
-                        <input type="hidden" name="externalId" th:value="${book.externalId}">
-                        <input type="hidden" name="title" th:value="${book.title}">
-                        <input type="hidden" name="authors" th:value="${book.authors}">
-                        <input type="hidden" name="coverUrl" th:value="${book.coverUrl}">
-                        <input type="hidden" name="fromDetails" value="true">
-                        <input type="hidden" name="userBookId" th:if="${isSaved}" th:value="${userBookId}">
-                        <button type="submit" name="newStatus" value="COMPLETED" class="menu-opt">✅ Read</button>
-                    </form>
-
-                    <div th:if="${isSaved}">
+                    <div id="removeOptionWrapper" th:style="${isSaved} ? 'display:block' : 'display:none'">
                         <hr style="border: 0; border-top: 1px solid #eee; margin: 5px 0;">
-                        <form th:action="@{/library/remove}" method="post">
-                            <input type="hidden" name="userBookId" th:value="${userBookId}">
-                            <input type="hidden" name="fromDetails" value="true">
-                            <button type="submit" class="menu-opt" style="color: #ff4b2b;"
-                                    onclick="return confirm('Remove this book from your shelves?')">
-                                🗑️ Remove from library
-                            </button>
-                        </form>
+                        <button type="button" class="menu-opt" style="color: #ff4b2b;" onclick="handleDelete()">🗑️ Remove from library</button>
                     </div>
                 </div>
             </div>
         </div>
-
-        <div th:if="${isSaved}">
-            <p style="margin-top: 20px; color: #2ecc71; font-weight: bold;">✓ This book is on your shelf</p>
+        <div id="savedMark" th:style="${isSaved} ? 'display:block; margin-top:20px;' : 'display:none; margin-top:20px;'">
+            <p style="color: #2ecc71; font-weight: bold;">✓ This book is on your shelf</p>
         </div>
     </div>
 </div>
 
-<script>
-    const trigger = document.getElementById('userMenuTrigger');
-    const menu = document.getElementById('dropdownMenu');
-
-    trigger.addEventListener('click', function(e) {
-        e.stopPropagation();
-        menu.classList.toggle('active');
-    });
-
-    function toggleAddMenu(btn) {
+<script th:inline="javascript">
+    // 1. DROPDOWNS
+    function toggleAddMenu(event) {
         if (event) event.stopPropagation();
-        const addMenu = btn.nextElementSibling;
-        addMenu.classList.toggle('show');
+        document.getElementById('statusOptions').classList.toggle('show');
     }
 
-    window.onclick = function(event) {
-        if (!event.target.closest('#userMenuTrigger')) {
-            if (menu && menu.classList.contains('active')) {
-                menu.classList.remove('active');
-            }
-        }
+    const userTrigger = document.getElementById('userMenuTrigger');
+    const userMenu = document.getElementById('dropdownMenu');
+    userTrigger.onclick = function(e) {
+        e.stopPropagation();
+        userMenu.classList.toggle('active');
+    };
 
-        if (!event.target.matches('.btn-add-main')) {
-            const addMenus = document.querySelectorAll('.add-menu-options');
-            addMenus.forEach(m => {
-                if (m.classList.contains('show')) {
-                    m.classList.remove('show');
-                }
-            });
+    window.onclick = function(event) {
+        if (!event.target.closest('.dropdown-add')) {
+            document.getElementById('statusOptions').classList.remove('show');
+        }
+        if (!event.target.closest('#userMenuTrigger')) {
+            userMenu.classList.remove('active');
         }
     };
+
+    // 2. AJAX LOGIC
+    let currentUserBookId = [[${userBookId != null ? userBookId : 'null'}]];
+
+    function handleAction(status) {
+        // Pobieramy tokeny z meta tagów
+        const token = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+        const header = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
+        const params = new URLSearchParams();
+        params.append('externalId', [[${book.externalId}]]);
+        params.append('title', [[${book.title}]]);
+        params.append('authors', [[${book.authors}]]);
+        params.append('coverUrl', [[${book.coverUrl}]]);
+        params.append('newStatus', status);
+        params.append('numberOfPages', [[${book.numberOfPages}]]);
+
+        fetch('/library/api/add', {
+            method: 'POST',
+            body: params,
+            headers: {
+                [header]: token // Dodajemy token CSRF do nagłówka
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            if(data.status === 'success') {
+                currentUserBookId = data.userBookId;
+                updateUI(status, true);
+            }
+        })
+        .catch(err => console.error("Error:", err));
+    }
+
+    function handleDelete() {
+        if(!currentUserBookId || currentUserBookId === 'null') return;
+        if(!confirm('Remove this book from your shelves?')) return;
+
+        const token = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+        const header = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
+        const params = new URLSearchParams();
+        params.append('userBookId', currentUserBookId);
+
+        fetch('/library/api/remove', {
+            method: 'POST',
+            body: params,
+            headers: {
+                [header]: token // Dodajemy token CSRF do nagłówka
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            if(data.status === 'deleted') {
+                currentUserBookId = 'null';
+                updateUI(null, false);
+            }
+        })
+        .catch(err => console.error("Error:", err));
+    }
+
+    function updateUI(status, isSaved) {
+        const btn = document.getElementById('mainStatusBtn');
+        const text = document.getElementById('mainStatusText');
+        const removeWrapper = document.getElementById('removeOptionWrapper');
+        const savedMark = document.getElementById('savedMark');
+
+        if(isSaved) {
+            btn.className = 'btn-status-active';
+            text.innerText = formatStatusName(status);
+            removeWrapper.style.display = 'block';
+            savedMark.style.display = 'block';
+        } else {
+            btn.className = 'btn-add-main';
+            text.innerText = 'Add to shelf ▾';
+            removeWrapper.style.display = 'none';
+            savedMark.style.display = 'none';
+        }
+        document.getElementById('statusOptions').classList.remove('show');
+    }
+
+    function formatStatusName(status) {
+        const map = { 'READING': '📖 Currently reading ▾', 'TO_READ': '⏳ Want to read ▾', 'COMPLETED': '✅ Read ▾' };
+        return map[status] || 'Add to shelf ▾';
+    }
 </script>
 </body>
 </html>

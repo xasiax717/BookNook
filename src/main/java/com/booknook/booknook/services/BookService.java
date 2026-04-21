@@ -18,13 +18,24 @@ public class BookService {
     public List<Book> searchBooks(String query) {
         if (query == null || query.trim().isEmpty()) return new ArrayList<>();
 
+        String solrQuery = "title:(" + query + ") OR author:(" + query + ")";
+
+        System.out.println(solrQuery + " --- NOWY SOLR QUERY ---");
+
         // 1. Uproszczony URL - bez agresywnych filtrów, które mogą ukrywać "Fourth Wing"
+        /**
         String url = UriComponentsBuilder
                 .fromHttpUrl("https://openlibrary.org/search.json")
-                .queryParam("q", query)
-                .queryParam("lang", "pol,eng")
-                .queryParam("limit", 150) // Pobieramy dużo, żeby Java miała co filtrować
+                .queryParam("q", solrQuery)
+                //.queryParam("lang", "pol,eng")
+                .queryParam("limit", 150)
+                //.queryParam("author", query)
                 .toUriString();
+         */
+
+        String url = "https://openlibrary.org/search.json?q=" + query.replace(" ", "+") + "&limit=150";
+
+        System.out.println(url + " --- WYGENEROWANY URL DO OPEN LIBRARY ---");
 
         try {
             OpenLibraryResponse response = restTemplate.getForObject(url, OpenLibraryResponse.class);
@@ -32,8 +43,14 @@ public class BookService {
             // Set będzie trzymał ID (key), a nie tytuły, żeby nie blokować części serii o podobnych nazwach
             java.util.Set<String> seenKeys = new java.util.HashSet<>();
 
+            System.out.println(response + " --- OTRZYMANO OD OPEN LIBRARY ---");
+
             if (response != null && response.getDocs() != null) {
+                System.out.println("--- START SEARCH DEBUG ---");
+                System.out.println("API zwróciło surowych wyników: " + response.getDocs().size());
+
                 for (var doc : response.getDocs()) {
+
 
                     // FILTR 1: Musi mieć okładkę (jakość)
                     if (doc.getCoverI() == null) continue;
@@ -58,6 +75,8 @@ public class BookService {
                         books.add(mapOpenLibraryToEntity(doc));
                         seenKeys.add(doc.getKey());
                     }
+
+//                    System.out.println("Książka: " + doc.getTitle() + " Języki: " + doc.getLanguage());
 
                     if (books.size() >= 30) break;
                 }

@@ -23,7 +23,7 @@ public class OpenLibraryService {
 
                 // 2. SZUKAMY DATY I STRON W EDYCJACH
                 // Zwiększamy limit do 20, żeby mieć większą szansę na znalezienie oryginału
-                String editionsUrl = "https://openlibrary.org" + externalId + "/editions.json?limit=30";
+                String editionsUrl = "https://openlibrary.org" + externalId + "/editions.json?limit=100";
                 Map<String, Object> edResponse = restTemplate.getForObject(editionsUrl, Map.class);
 
                 Integer oldestYear = null;
