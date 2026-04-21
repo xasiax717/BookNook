@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>BookNook - Znajomi</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        /* Globalne style i tło */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* Nagłówki sekcji */
+        .results-header {
+            color: white;
+            font-weight: 600;
+            font-size: 24px;
+            margin: 40px 0 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            letter-spacing: 0.5px;
+        }
+
+        /* Wyszukiwarka */
+        .search-bar-container {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            margin-bottom: 50px;
+        }
+
+        .search-form {
+            display: flex;
+            gap: 15px;
+        }
+
+        .search-input {
+            flex-grow: 1;
+            padding: 15px 20px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: white;
+            font-size: 16px;
+            font-family: inherit;
+            transition: 0.3s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.2);
+        }
+
+        /* Siatka i Karty */
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 30px;
+        }
+
+        .user-card {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        .user-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        }
+
+        .user-avatar-wrapper {
+            height: 100px;
+            width: 100px;
+            background: #f3f4f6;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 45px;
+            margin-bottom: 20px;
+            border: 4px solid #f8f9fa;
+        }
+
+        .user-name {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1a202c;
+            margin-bottom: 5px;
+        }
+
+        .user-status {
+            font-size: 14px;
+            color: #718096;
+            margin-bottom: 20px;
+        }
+
+        /* Przyciski */
+        .btn-action {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-family: inherit;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-top: 8px;
+        }
+
+        .btn-add {
+            background: #764ba2;
+            color: white;
+            box-shadow: 0 4px 12px rgba(118, 75, 162, 0.3);
+        }
+
+        .btn-add:hover {
+            background: #667eea;
+            transform: scale(1.02);
+        }
+
+        .btn-remove {
+            background: #fee2e2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+        }
+
+        .btn-remove:hover {
+            background: #fecaca;
+        }
+
+        .btn-block {
+            background: transparent;
+            color: #a0aec0;
+            text-decoration: underline;
+            font-size: 12px;
+            margin-top: 15px;
+        }
+
+        .btn-block:hover {
+            color: #4a5568;
+        }
+
+        /* Brak wyników */
+        .no-results {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            color: #4a5568;
+            grid-column: 1 / -1;
+        }
+
+        form { width: 100%; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <div class="search-bar-container">
+        <h2 style="color: white; margin: 0 0 20px 0; font-weight: 600;">Znajdź czytelników</h2>
+        <form th:action="@{/friends/search}" method="get" class="search-form">
+            <input type="text" name="q" class="search-input" placeholder="Wpisz nazwę użytkownika..." required>
+            <button type="submit" class="btn-action btn-add" style="width: auto; padding: 0 30px; margin-top: 0;">Szukaj</button>
+        </form>
+    </div>
+
+    <div th:if="${searchResults != null}">
+        <h2 class="results-header">Ludzie, których możesz znać</h2>
+        <div class="results-grid">
+            <div th:each="user : ${searchResults}" class="user-card">
+                <div class="user-avatar-wrapper">👤</div>
+                <div class="user-name" th:text="${user.username}">Nazwa Użytkownika</div>
+                <div class="user-status">Użytkownik BookNook</div>
+
+                <form th:action="@{/friends/add/{id}(id=${user.id})}" method="post">
+                    <button type="submit" class="btn-action btn-add">Dodaj do znajomych</button>
+                </form>
+
+                <form th:action="@{/friends/block/{id}(id=${user.id})}" method="post">
+                    <button type="submit" class="btn-action btn-block">Zablokuj użytkownika</button>
+                </form>
+            </div>
+
+            <div th:if="${#lists.isEmpty(searchResults)}" class="no-results">
+                <p>Niestety, nie znaleźliśmy nikogo o tej nazwie.</p>
+            </div>
+        </div>
+    </div>
+
+    <div th:if="${pendingRequests != null and !#lists.isEmpty(pendingRequests)}">
+        <h2 class="results-header">Zaproszenia do znajomych
+            <span style="background: #ff4b2b; padding: 2px 10px; border-radius: 20px; font-size: 14px; vertical-align: middle;">!</span>
+        </h2>
+        <div class="results-grid">
+            <div th:each="request : ${pendingRequests}" class="user-card" style="border: 2px solid #667eea;">
+                <div class="user-avatar-wrapper">👋</div>
+                <div class="user-name" th:text="${request.requester.username}">Nazwa Użytkownika</div>
+                <div class="user-status">Chce zostać Twoim znajomym</div>
+
+                <div style="display: flex; gap: 10px; width: 100%;">
+                    <form th:action="@{/friends/accept/{id}(id=${request.id})}" method="post" style="flex: 1;">
+                        <button type="submit" class="btn-action btn-add">Akceptuj</button>
+                    </form>
+                    <form th:action="@{/friends/remove/{id}(id=${request.id})}" method="post" style="flex: 1;">
+                        <button type="submit" class="btn-action btn-remove">Odrzuć</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="results-header">Twoi Znajomi</h2>
+    <div class="results-grid">
+        <div th:each="friendship : ${friends}" class="user-card">
+            <div class="user-avatar-wrapper">📖</div>
+            <div class="user-name"
+                 th:text="${friendship.requester.username == username ? friendship.addressee.username : friendship.requester.username}">
+                Imię Znajomego
+            </div>
+            <div class="user-status">Znajomi od: <span th:text="${#temporals.format(friendship.createdAt, 'dd.MM.yyyy')}"></span></div>
+
+            <form th:action="@{/friends/remove/{id}(id=${friendship.id})}" method="post">
+                <button type="submit" class="btn-action btn-remove">Usuń ze znajomych</button>
+            </form>
+
+        </div>
+
+        <div th:if="${#lists.isEmpty(friends)}" class="no-results">
+            <p>Twoja lista znajomych jest pusta. Czas kogoś poznać!</p>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>

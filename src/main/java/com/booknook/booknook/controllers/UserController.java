@@ -131,4 +131,5 @@ public class UserController {
             return "redirect:/home"; // W razie awarii wróć do home zamiast pokazywać błąd 500
         }
     }
+
 }
