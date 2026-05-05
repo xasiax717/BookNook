@@ -26,6 +26,8 @@ public class BookController {
             model.addAttribute("username", principal.getName());
         }
         List<Book> books = bookService.searchBooks(query);
+
+        System.out.println(books);
         model.addAttribute("books", books);
         model.addAttribute("query", query);
         return "search-results"; // Nowy plik HTML

@@ -9,6 +9,8 @@ import com.booknook.booknook.services.UserService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -26,6 +28,8 @@ public class UserController {
     private UserBookRepository userBookRepository;
     @Autowired
     private UserRepository userRepository;
+
+
 
     @GetMapping("/register")
     public String showRegistrationForm(Model model) {
@@ -74,6 +78,38 @@ public class UserController {
 
         return "redirect:/login?success";
     }
+
+    @GetMapping("/user/{username}")
+    public String showUserProfile(@PathVariable String username, Model model, @AuthenticationPrincipal UserDetails currentUser) {
+        // 1. Pobieramy dane użytkownika, którego profil oglądamy
+        User profileOwner = userService.findByUsername(username);
+
+        // 2. Pobieramy jego książki (zakładam, że masz relację lub metodę w UserBookService)
+        // Jeśli masz encję UserBook, pobieramy listę dla profileOwner
+        model.addAttribute("user", profileOwner);
+        model.addAttribute("books", userBookRepository.findByUser(profileOwner));
+
+        // 3. Sprawdzamy relację między mną a właścicielem profilu (opcjonalnie, do przycisków)
+        User me = userService.findByUsername(currentUser.getUsername());
+        model.addAttribute("friendshipStatus", userService.getFriendshipStatus(me, profileOwner));
+
+        return "profile";
+    }
+
+//    @GetMapping("/user/{username}")
+//    public String showProfile(@PathVariable String username, Model model) {
+//        // 1. Pobieramy usera z bazy po loginie
+//        User user = userService.findByUsername(username);
+//
+//        // 2. Pobieramy jego książki (używając Twojej metody findByUser)
+//        List<UserBook> books = userBookRepository.findByUser(user);
+//
+//        // 3. Dodajemy do modelu
+//        model.addAttribute("user", user);
+//        model.addAttribute("books", books);
+//
+//        return "profile";
+//    }
 
     @GetMapping("/statistics")
     public String showStatistics(Principal principal, Model model) {

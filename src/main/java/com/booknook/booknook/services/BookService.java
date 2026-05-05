@@ -22,7 +22,7 @@ public class BookService {
 
         System.out.println(solrQuery + " --- NOWY SOLR QUERY ---");
 
-        // 1. Uproszczony URL - bez agresywnych filtrów, które mogą ukrywać "Fourth Wing"
+
         /**
         String url = UriComponentsBuilder
                 .fromHttpUrl("https://openlibrary.org/search.json")
@@ -33,9 +33,9 @@ public class BookService {
                 .toUriString();
          */
 
-        String url = "https://openlibrary.org/search.json?q=" + query.replace(" ", "+") + "&limit=150";
-
-        System.out.println(url + " --- WYGENEROWANY URL DO OPEN LIBRARY ---");
+        //String url = "https://openlibrary.org/search.json?q=" + query.replace(" ", "+") + "&limit=150";
+        String url = "https://openlibrary.org/search.json?q=" + query.replace(" ", "+")
+                + "&limit=150&fields=key,title,author_name,first_publish_year,cover_i,isbn,language,number_of_pages_median";
 
         try {
             OpenLibraryResponse response = restTemplate.getForObject(url, OpenLibraryResponse.class);
@@ -43,14 +43,10 @@ public class BookService {
             // Set będzie trzymał ID (key), a nie tytuły, żeby nie blokować części serii o podobnych nazwach
             java.util.Set<String> seenKeys = new java.util.HashSet<>();
 
-            System.out.println(response + " --- OTRZYMANO OD OPEN LIBRARY ---");
 
             if (response != null && response.getDocs() != null) {
-                System.out.println("--- START SEARCH DEBUG ---");
-                System.out.println("API zwróciło surowych wyników: " + response.getDocs().size());
 
                 for (var doc : response.getDocs()) {
-
 
                     // FILTR 1: Musi mieć okładkę (jakość)
                     if (doc.getCoverI() == null) continue;

@@ -49,9 +49,8 @@ public class LibraryController {
             @RequestParam String authors,
             @RequestParam(required = false) String coverUrl,
             @RequestParam String newStatus,
-            @RequestParam Integer numberOfPages,
+            @RequestParam(required = false) Integer numberOfPages, // DODANO required = false
             @RequestParam(defaultValue = "false") boolean fromDetails,
-            // Ustawiamy domyślną wartość
             Principal principal,
             RedirectAttributes redirectAttributes) {
 
@@ -60,6 +59,7 @@ public class LibraryController {
         }
 
         try {
+            System.out.println(numberOfPages);
             User user = userRepository.findByUsername(principal.getName())
                     .orElseThrow(() -> new RuntimeException("Użytkownik nie znaleziony"));
 
@@ -231,7 +231,7 @@ public class LibraryController {
             @RequestParam String authors,
             @RequestParam(required = false) String coverUrl,
             @RequestParam String newStatus,
-            @RequestParam Integer numberOfPages,
+            @RequestParam(required = false) Integer numberOfPages,
             Principal principal) {
         try {
             User user = userRepository.findByUsername(principal.getName()).orElseThrow();
