@@ -5,6 +5,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class OpenLibraryService {
@@ -21,8 +22,18 @@ public class OpenLibraryService {
             if (workResponse != null) {
                 details.put("description", extractDescription(workResponse));
 
+                if (workResponse.containsKey("subjects")) {
+                    List<String> subjects = (List<String>) workResponse.get("subjects");
+                    if (subjects != null && !subjects.isEmpty()) {
+                        // Bierzemy max 5 kategorii i łączymy przecinkiem
+                        String cats = subjects.stream()
+                                .limit(5)
+                                .collect(Collectors.joining(", "));
+                        details.put("categories", cats);
+                    }
+                }
+
                 // 2. SZUKAMY DATY I STRON W EDYCJACH
-                // Zwiększamy limit do 20, żeby mieć większą szansę na znalezienie oryginału
                 String editionsUrl = "https://openlibrary.org" + externalId + "/editions.json?limit=100";
                 Map<String, Object> edResponse = restTemplate.getForObject(editionsUrl, Map.class);
 

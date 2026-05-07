@@ -27,12 +27,14 @@ public class Book {
     private String authors;
 
     @Column(columnDefinition = "TEXT")
+    private String categories;
+
+    @Column(columnDefinition = "TEXT")
     private String description;
 
     private String isbn;
     private Integer firstPublishYear;
     private String coverUrl;
-    private String categories;
     private Integer numberOfPages;
 
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL)

@@ -24,6 +24,9 @@ public class OpenLibraryResponse {
         @JsonProperty("language")
         private List<String> language;
 
+        @JsonProperty("subject")
+        private List<String> subject;
+
         @JsonProperty("isbn")
         private List<String> isbn;
 

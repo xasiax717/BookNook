@@ -62,6 +62,11 @@
             <div class="meta-item" th:if="${book.numberOfPages != null}">
                 <span>📖</span><span th:text="${book.numberOfPages} + ' pages'">350 pages</span>
             </div>
+            <th:block th:if="${book.categories != null and !#strings.isEmpty(book.categories)}">
+                <div class="meta-item" th:each="cat : ${#strings.arraySplit(book.categories, ',')}">
+                    <span>🏷️</span><span th:text="${#strings.trim(cat)}">Fantasy</span>
+                </div>
+            </th:block>
         </div>
 
         <p style="font-weight: bold; color: #888; margin-bottom: 8px; font-size: 13px; text-transform: uppercase; letter-spacing: 1px;">Description</p>
@@ -137,6 +142,7 @@
         params.append('externalId', [[${book.externalId}]]);
         params.append('title', [[${book.title}]]);
         params.append('authors', [[${book.authors}]]);
+        params.append('categories', [[${book.categories}]]);
         params.append('coverUrl', [[${book.coverUrl}]]);
         params.append('newStatus', status);
         params.append('numberOfPages', [[${book.numberOfPages}]]);

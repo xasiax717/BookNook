@@ -49,7 +49,8 @@ public class LibraryController {
             @RequestParam String authors,
             @RequestParam(required = false) String coverUrl,
             @RequestParam String newStatus,
-            @RequestParam(required = false) Integer numberOfPages, // DODANO required = false
+            @RequestParam(required = false) String categories,
+            @RequestParam(required = false) Integer numberOfPages,
             @RequestParam(defaultValue = "false") boolean fromDetails,
             Principal principal,
             RedirectAttributes redirectAttributes) {
@@ -70,6 +71,7 @@ public class LibraryController {
                 newBook.setTitle(title);
                 newBook.setAuthors(authors);
                 newBook.setCoverUrl(coverUrl);
+                newBook.setCategories(categories);
                 newBook.setNumberOfPages(numberOfPages);
                 return bookRepository.save(newBook);
             });
@@ -99,6 +101,7 @@ public class LibraryController {
                     .queryParam("coverUrl", coverUrl)
                     .queryParam("title", title)
                     .queryParam("authors", authors)
+                    .queryParam("categories", categories)
                     .build()
                     .toUriString();
         }
@@ -173,9 +176,9 @@ public class LibraryController {
                                   @RequestParam(required = false) String coverUrl,
                                   @RequestParam(required = false) String title,
                                   @RequestParam(required = false) String authors,
+                                  @RequestParam(required = false) String categories,
                                   Model model, Principal principal) {
 
-        // 1. Podstawowe dane książki (tak jak robiliśmy)
         Book book = bookRepository.findByExternalId(id).orElse(null);
         if (book == null) {
             book = new Book();
@@ -183,12 +186,27 @@ public class LibraryController {
             book.setCoverUrl(coverUrl);
             book.setTitle(title);
             book.setAuthors(authors);
+            book.setCategories(categories);
         }
+
 
         Map<String, Object> extraDetails = openLibraryService.fetchBookDetails(id);
 
         // Przypisujemy pobrane dane do obiektu book
-        book.setDescription((String) extraDetails.get("description"));
+        if (book.getDescription() == null || book.getDescription().isEmpty()) {
+            String apiDescription = (String) extraDetails.get("description");
+            if (apiDescription != null) {
+                book.setDescription(apiDescription);
+            }
+        }
+        if (book.getCategories() == null || book.getCategories().isEmpty()) {
+            String apiCategories = (String) extraDetails.get("categories");
+            if (apiCategories != null) {
+                book.setCategories(apiCategories);
+            } else if (categories != null) {
+                book.setCategories(categories);
+            }
+        }
 
         if (extraDetails.get("firstPublishYear") != null) {
             book.setFirstPublishYear((Integer) extraDetails.get("firstPublishYear"));
@@ -231,6 +249,7 @@ public class LibraryController {
             @RequestParam String authors,
             @RequestParam(required = false) String coverUrl,
             @RequestParam String newStatus,
+            @RequestParam(required = false) String categories,
             @RequestParam(required = false) Integer numberOfPages,
             Principal principal) {
         try {
@@ -243,6 +262,7 @@ public class LibraryController {
                 newBook.setTitle(title);
                 newBook.setAuthors(authors);
                 newBook.setCoverUrl(coverUrl);
+                newBook.setCategories(categories);
                 newBook.setNumberOfPages(numberOfPages);
                 return bookRepository.save(newBook);
             });

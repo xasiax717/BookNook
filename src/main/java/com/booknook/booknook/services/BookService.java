@@ -35,7 +35,7 @@ public class BookService {
 
         //String url = "https://openlibrary.org/search.json?q=" + query.replace(" ", "+") + "&limit=150";
         String url = "https://openlibrary.org/search.json?q=" + query.replace(" ", "+")
-                + "&limit=150&fields=key,title,author_name,first_publish_year,cover_i,isbn,language,number_of_pages_median";
+                + "&limit=150&fields=key,title,author_name,first_publish_year,cover_i,isbn,language,number_of_pages_median,subject";
 
         try {
             OpenLibraryResponse response = restTemplate.getForObject(url, OpenLibraryResponse.class);
@@ -102,6 +102,15 @@ public class BookService {
             book.setIsbn(doc.getIsbn().get(0));
         }
 
+        if (doc.getSubject()!= null && !doc.getSubject().isEmpty()) {
+            String tags = doc.getSubject().stream()
+                    .limit(5)
+                    .collect(java.util.stream.Collectors.joining(", "));
+            book.setCategories(tags);
+            System.out.println("Zmapowane kategorie: " + tags);
+        } else {
+            book.setCategories("General");
+        }
         return book;
     }
 
