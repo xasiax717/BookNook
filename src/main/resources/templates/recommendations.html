@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Recommendations - BookNook</title>
+    <link rel="stylesheet" th:href="@{/css/common.css}">
+    <style>
+        .rec-container { max-width: 1100px; margin: 100px auto; padding: 20px; }
+        .rec-container h2 { color: #333; margin-bottom: 30px; }
+        .grid { display: flex; flex-wrap: wrap; gap: 20px; }
+        .card { width: 160px; background: white; border-radius: 12px; padding: 12px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.1); transition: 0.2s; }
+        .card:hover { transform: translateY(-4px); }
+        .card img { width: 100%; border-radius: 8px; }
+        .book-title { font-size: 13px; font-weight: bold; color: #333; margin-top: 8px; }
+        .book-author { font-size: 12px; color: #888; margin-top: 4px; }
+        .empty-msg { color: #888; font-size: 15px; }
+    </style>
+</head>
+<body>
+<nav class="navbar">
+    <div class="nav-left"><a href="/home" class="btn-back">← Back</a></div>
+    <div class="nav-center"><h1>BookNook</h1></div>
+    <div class="nav-right">
+        <span class="user-greeting" th:text="'Hello, ' + ${username}">Hello!</span>
+    </div>
+</nav>
+
+<div class="rec-container">
+    <h2>📚 Recommended for you</h2>
+
+    <div th:if="${recommendations.isEmpty()}" class="empty-msg">
+        <p>Add some books to your library first — we'll recommend based on your taste! 😊</p>
+    </div>
+
+    <div class="grid" th:unless="${recommendations.isEmpty()}">
+        <div th:each="book : ${recommendations}" class="card">
+            <a th:href="@{/library/book-details(id=${book.externalId})}">
+                <img th:src="${book.coverUrl != null ? book.coverUrl :
+                    'https://via.placeholder.com/160x220?text=No+Cover'}" alt="Cover">
+            </a>
+            <a th:href="@{/library/book-details(id=${book.externalId})}" style="text-decoration:none;">
+                <div class="book-title" th:text="${book.title}">Title</div>
+            </a>
+            <div class="book-author" th:text="${book.authors}">Author</div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

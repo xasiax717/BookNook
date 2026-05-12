@@ -15,4 +15,5 @@ public interface UserBookRepository extends JpaRepository<UserBook, Long> {
 
     boolean existsByUserAndBook(User user, Book book);
     List<UserBook> findByUser(User user);
+    List<UserBook> findByUserAndStatus(User user, String status);
 }

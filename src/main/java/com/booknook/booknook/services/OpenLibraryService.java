@@ -1,7 +1,10 @@
 package com.booknook.booknook.services;
 
+import com.booknook.booknook.entities.Book;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -116,5 +119,46 @@ public class OpenLibraryService {
         if (dashesIndex != -1 && (cutIndex == -1 || dashesIndex < cutIndex)) cutIndex = dashesIndex;
         if (seeAlsoIndex != -1 && (cutIndex == -1 || seeAlsoIndex < cutIndex)) cutIndex = seeAlsoIndex;
         return (cutIndex != -1) ? text.substring(0, cutIndex).trim() : text.trim();
+    }
+
+    public List<Book> searchBooksByCategory(String category, List<String> excludedIds) {
+        List<Book> results = new ArrayList<>();
+        try {
+            String url = "https://openlibrary.org/search.json?subject="
+                    + category.replace(" ", "+") + "&limit=10&fields=key,title,author_name,cover_i,subject";
+            Map<String, Object> response = restTemplate.getForObject(url, Map.class);
+
+            if (response != null && response.containsKey("docs")) {
+                List<Map<String, Object>> docs = (List<Map<String, Object>>) response.get("docs");
+                for (Map<String, Object> doc : docs) {
+                    String externalId = (String) doc.get("key");
+                    if (externalId == null || excludedIds.contains(externalId)) continue;
+
+                    Book book = new Book();
+                    book.setExternalId(externalId);
+                    book.setTitle((String) doc.get("title"));
+
+                    List<String> authors = (List<String>) doc.get("author_name");
+                    if (authors != null && !authors.isEmpty()) {
+                        book.setAuthors(String.join(", ", authors));
+                    }
+
+                    Object coverId = doc.get("cover_i");
+                    if (coverId != null) {
+                        book.setCoverUrl("https://covers.openlibrary.org/b/id/" + coverId + "-M.jpg");
+                    }
+
+                    List<String> subjects = (List<String>) doc.get("subject");
+                    if (subjects != null && !subjects.isEmpty()) {
+                        book.setCategories(subjects.stream().limit(5).collect(Collectors.joining(", ")));
+                    }
+
+                    results.add(book);
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Błąd pobierania rekomendacji z API: " + e.getMessage());
+        }
+        return results;
     }
 }
