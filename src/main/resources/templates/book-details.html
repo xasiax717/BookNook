@@ -105,6 +105,95 @@
             <p style="color: #2ecc71; font-weight: bold;">✓ This book is on your shelf</p>
         </div>
     </div>
+
+    <div style="margin-top: 40px; border-top: 2px solid #f0f2ff; padding-top: 30px;">
+
+        <!-- Średnia ocena -->
+        <div th:if="${averageRating != null}" style="margin-bottom: 20px;">
+        <span style="font-size: 22px; font-weight: bold; color: #667eea;">
+            ⭐ <span th:text="${#numbers.formatDecimal(averageRating, 1, 1)}">4.5</span> / 5
+        </span>
+        </div>
+
+        <!-- Formularz recenzji: TYLKO gdy status = COMPLETED -->
+        <div th:if="${currentStatus == 'COMPLETED'}">
+            <h3 style="color: #333; margin-bottom: 15px;"
+                th:text="${userReview != null} ? 'Twoja recenzja' : 'Dodaj recenzję'">Dodaj recenzję</h3>
+
+            <form th:action="@{/reviews/save}" method="post">
+                <input type="hidden" name="externalId" th:value="${book.externalId}">
+
+                <!-- Gwiazdki (CSS-only, bez JS) -->
+                <div style="margin-bottom: 15px;">
+                    <span style="font-weight: bold; color: #555; font-size: 13px; text-transform: uppercase; letter-spacing: 1px;">Ocena:</span>
+                    <div style="display: flex; gap: 8px; margin-top: 8px;">
+                        <th:block th:each="i : ${#numbers.sequence(1, 5)}">
+                            <label style="cursor: pointer;">
+                                <input type="radio" name="rating" th:value="${i}"
+                                       th:checked="${userReview != null and userReview.rating == i}"
+                                       required>
+                                <span th:text="${i}">★</span>⭐
+                            </label>
+                        </th:block>
+                    </div>
+                </div>
+
+                <textarea name="reviewText" rows="4"
+                          th:text="${userReview != null ? userReview.reviewText : ''}"
+                          placeholder="Napisz swoją recenzję..."
+                          style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #e0e6ff;
+                             font-size: 14px; resize: vertical; font-family: inherit;"></textarea>
+
+                <button type="submit"
+                        style="margin-top: 10px; padding: 10px 25px; background: linear-gradient(135deg, #667eea, #764ba2);
+                           color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">
+                    <span th:text="${userReview != null} ? 'Zaktualizuj recenzję' : 'Dodaj recenzję'">Dodaj</span>
+                </button>
+            </form>
+
+            <form th:if="${userReview != null}" th:action="@{/reviews/delete}" method="post" style="margin-top: 10px;">
+                <input type="hidden" name="reviewId" th:value="${userReview.id}">
+                <input type="hidden" name="externalId" th:value="${book.externalId}">
+                <button type="submit"
+                        onclick="return confirm('Usunąć recenzję?')"
+                        style="padding: 8px 20px; background: white; color: #ff4b2b; border: 2px solid #ff4b2b;
+                           border-radius: 8px; cursor: pointer; font-weight: bold;">
+                    🗑️ Usuń recenzję
+                </button>
+            </form>
+        </div>
+
+        <!-- Komunikat dla innych statusów -->
+        <div th:if="${isSaved and currentStatus != 'COMPLETED'}" style="color: #888; font-style: italic; margin-bottom: 20px;">
+            📖 Oznacz książkę jako przeczytaną, żeby dodać recenzję.
+        </div>
+
+        <!-- Lista recenzji innych użytkowników -->
+        <div style="margin-top: 35px;">
+            <h3 style="color: #333; margin-bottom: 20px;">Recenzje użytkowników</h3>
+
+            <div th:if="${reviews == null or #lists.isEmpty(reviews)}" style="color: #888;">
+                Brak recenzji. Bądź pierwszy! 😊
+            </div>
+
+            <div th:each="review : ${reviews}"
+                 th:unless="${review.user.username == username}"
+                 style="background: #f9faff; border-radius: 10px; padding: 15px; margin-bottom: 15px;
+                    border-left: 4px solid #667eea;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                    <strong th:text="${review.user.username}" style="color: #667eea;">user</strong>
+                    <span style="color: #aaa; font-size: 12px;"
+                          th:text="${#temporals.format(review.createdAt, 'dd.MM.yyyy')}">01.01.2024</span>
+                </div>
+                <div style="color: #f0a500; font-size: 18px; margin-bottom: 8px;">
+                    <th:block th:each="i : ${#numbers.sequence(1, 5)}">
+                        <span th:text="${i <= review.rating} ? '★' : '☆'">★</span>
+                    </th:block>
+                </div>
+                <p th:text="${review.reviewText}" style="color: #444; margin: 0;">Treść recenzji</p>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script th:inline="javascript">
@@ -202,6 +291,13 @@
             text.innerText = formatStatusName(status);
             removeWrapper.style.display = 'block';
             savedMark.style.display = 'block';
+
+            // Jeśli status zmienił się na COMPLETED — odśwież stronę żeby pokazać formularz recenzji
+            if (status === 'COMPLETED') {
+                window.location.reload();
+                return;
+            }
+
         } else {
             btn.className = 'btn-add-main';
             text.innerText = 'Add to shelf ▾';

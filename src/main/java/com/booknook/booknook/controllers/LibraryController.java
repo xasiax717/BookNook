@@ -4,9 +4,11 @@ import com.booknook.booknook.entities.Book;
 import com.booknook.booknook.entities.User;
 import com.booknook.booknook.entities.UserBook;
 import com.booknook.booknook.repositories.BookRepository;
+import com.booknook.booknook.repositories.ReviewRepository;
 import com.booknook.booknook.repositories.UserBookRepository;
 import com.booknook.booknook.repositories.UserRepository;
 import com.booknook.booknook.services.OpenLibraryService;
+import com.booknook.booknook.services.ReviewService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -31,15 +33,18 @@ public class LibraryController {
     private final BookRepository bookRepository;
     private final UserBookRepository userBookRepository;
     private final OpenLibraryService openLibraryService;
+    private final ReviewService reviewService;
 
     public LibraryController(UserRepository userRepository,
                              BookRepository bookRepository,
                              UserBookRepository userBookRepository,
-                             OpenLibraryService openLibraryService) {
+                             OpenLibraryService openLibraryService,
+                             ReviewService reviewService) {
         this.userRepository = userRepository;
         this.bookRepository = bookRepository;
         this.userBookRepository = userBookRepository;
         this.openLibraryService = openLibraryService;
+        this.reviewService = reviewService;
     }
 
     @PostMapping("/add")
@@ -238,6 +243,23 @@ public class LibraryController {
         model.addAttribute("book", book);
         System.out.println("DEBUG: Rok z API: " + extraDetails.get("firstPublishYear"));
         System.out.println("DEBUG: Strony z API: " + extraDetails.get("numberOfPages"));
+
+        Book savedBook = bookRepository.findByExternalId(id).orElse(null);
+        if (savedBook != null) {
+            model.addAttribute("reviews", reviewService.getReviewsForBook(savedBook));
+            model.addAttribute("averageRating", reviewService.getAverageRating(savedBook));
+
+            if (principal != null) {
+                User user = userRepository.findByUsername(principal.getName()).orElse(null);
+                if (user != null) {
+                    reviewService.getUserReviewForBook(user, savedBook)
+                            .ifPresent(r -> model.addAttribute("userReview", r));
+                }
+            }
+        } else {
+            model.addAttribute("reviews", List.of());
+        }
+
         return "book-details";
     }
 

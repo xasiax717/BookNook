@@ -30,9 +30,8 @@ public class RecommendationController {
         User user = userRepository.findByUsername(principal.getName())
                 .orElseThrow(() -> new RuntimeException("Użytkownik nie znaleziony"));
 
-        List<Book> recommendations = recommendationService.getRecommendations(user);
-
-        model.addAttribute("recommendations", recommendations);
+        model.addAttribute("recommendations", recommendationService.getRecommendations(user));
+        model.addAttribute("friendsRecommendations", recommendationService.getFriendsRecommendations(user)); // ← dodaj
         model.addAttribute("username", principal.getName());
 
         return "recommendations";

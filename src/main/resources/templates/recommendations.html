@@ -45,6 +45,27 @@
             <div class="book-author" th:text="${book.authors}">Author</div>
         </div>
     </div>
+    <!-- Sekcja znajomych -->
+    <div style="margin-top: 50px;">
+        <h2 style="color: #333; margin-bottom: 30px;">👥 Twoi znajomi czytają też...</h2>
+
+        <div th:if="${friendsRecommendations.isEmpty()}" class="empty-msg">
+            <p>Dodaj znajomych i poczekaj aż coś przeczytają — wtedy pojawią się tu rekomendacje! 😊</p>
+        </div>
+
+        <div class="grid" th:unless="${friendsRecommendations.isEmpty()}">
+            <div th:each="book : ${friendsRecommendations}" class="card">
+                <a th:href="@{/library/book-details(id=${book.externalId})}">
+                    <img th:src="${book.coverUrl != null ? book.coverUrl :
+                    'https://via.placeholder.com/160x220?text=No+Cover'}" alt="Cover">
+                </a>
+                <a th:href="@{/library/book-details(id=${book.externalId})}" style="text-decoration:none;">
+                    <div class="book-title" th:text="${book.title}">Title</div>
+                </a>
+                <div class="book-author" th:text="${book.authors}">Author</div>
+            </div>
+        </div>
+    </div>
 </div>
 </body>
 </html>
