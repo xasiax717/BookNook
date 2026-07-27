@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Past;
 import lombok.*;
+import jakarta.validation.constraints.Pattern;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.ArrayList;
@@ -23,13 +24,17 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Pattern(
+            regexp = "^(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?]).{8,}$",
+            message = "Password must be at least 8 characters, include an uppercase letter, a number, and a special character"
+    )
+    private String password;
 
     private String username;
     @Email(message = "Niepoprawny format adresu e-mail")
     @NotBlank(message = "E-mail nie może być pusty")
     @Column(unique = true) // To już masz pewnie dodane
     private String email;
-    private String password;
     @Transient
     private String confirmPassword;
     private String name;

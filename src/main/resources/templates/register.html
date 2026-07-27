@@ -277,6 +277,33 @@
             return true;
         }
     }
+    // Dodaj nową funkcję walidacji hasła
+    const passwordStrengthError = document.createElement('div');
+    passwordStrengthError.id = 'passwordStrengthError';
+    passwordStrengthError.className = 'error-message';
+    passwordStrengthError.style.display = 'none';
+    passwordStrengthError.textContent = 'Password must be at least 8 characters, include an uppercase letter, a number, and a special character.';
+    password.parentNode.insertBefore(passwordStrengthError, password.nextSibling);
+
+    function validatePasswordStrength() {
+        const re = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/;
+        const isValid = re.test(password.value);
+        if (password.value === '') {
+            passwordStrengthError.style.display = 'none';
+            password.classList.remove('input-error');
+            return true;
+        }
+        if (!isValid) {
+            passwordStrengthError.style.display = 'block';
+            password.classList.add('input-error');
+        } else {
+            passwordStrengthError.style.display = 'none';
+            password.classList.remove('input-error');
+        }
+        return isValid;
+    }
+
+    password.addEventListener('input', validatePasswordStrength);
 
     password.addEventListener('input', validatePasswords);
     confirmPassword.addEventListener('input', validatePasswords);
@@ -285,14 +312,14 @@
     form.addEventListener('submit', function(e) {
         const isPasswordValid = validatePasswords();
         const isEmailValid = validateEmail();
+        const isPasswordStrong = validatePasswordStrength();
 
-        if (!isPasswordValid || !isEmailValid) {
+        if (!isPasswordValid || !isEmailValid || !isPasswordStrong) {
             e.preventDefault();
-
             let alertMsg = "Please correct the errors in the form:\n";
+            if (!isPasswordStrong) alertMsg += "- Password does not meet requirements\n";
             if (!isPasswordValid) alertMsg += "- Passwords must match\n";
             if (!isEmailValid) alertMsg += "- Email format is invalid";
-
             alert(alertMsg);
         }
     });

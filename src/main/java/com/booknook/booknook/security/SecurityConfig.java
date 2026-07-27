@@ -18,7 +18,7 @@ public class SecurityConfig {
      return httpSecurity
 
              .authorizeHttpRequests(registry -> {
-                 registry.requestMatchers("/register", "/login", "/css/**", "/js/**", "/error").permitAll();
+                 registry.requestMatchers("/register", "/login", "/css/**", "/js/**", "/error", "/forgot-password", "/reset-password").permitAll();
                  registry.anyRequest().authenticated();
              })
              .formLogin(httpForm -> {
